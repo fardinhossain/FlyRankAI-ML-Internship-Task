@@ -563,8 +563,9 @@
         <li><a href="#limitations" class="toc-link">6. Limitations & Scientific Bounds</a></li>
         <li><a href="#playbook" class="toc-link">7. Ranked Action Playbook</a></li>
         <li><a href="#reproducibility" class="toc-link">8. Reproducibility & Artifacts</a></li>
-        <li><a href="#acknowledgments" class="toc-link">9. Acknowledgments & Credit</a></li>
-        <li><a href="#references" class="toc-link">10. References</a></li>
+        <li><a href="#conclusion" class="toc-link">9. Conclusion</a></li>
+        <li><a href="#acknowledgments" class="toc-link">10. Acknowledgments & Credit</a></li>
+        <li><a href="#references" class="toc-link">11. References</a></li>
       </ul>
     </aside>
 
@@ -989,9 +990,20 @@
         </ul>
       </section>
 
-      <!-- Section 9: Acknowledgments & Data Credit (Mandatory flyrank.ai link) -->
+      <!-- Section 9: Conclusion -->
+      <section id="conclusion">
+        <h2>9. Conclusion</h2>
+        <p>
+          This study evaluated machine learning models for prioritizing organic search content refresh on unseen client websites. By analyzing 30,000 mature URLs across 32 client accounts from an industrial search warehouse, we showed that supervised classifiers achieve a top-50 triage precision of 0.640 to 0.780 under honest client-grouped validation, outperforming deterministic heuristic rules (0.300) by more than double. Combining predicted decay probabilities with search demand in a composite Action Score elevated top-50 precision to 0.980, ensuring that human editorial hours are directed toward high-value pages.
+        </p>
+        <p>
+          Our findings underscore that naive random validation causes severe domain memorization and that practical deployment requires grouping data by client domain. In operational practice, decision-support machine learning transforms content refresh from subjective guesswork into an evidence-based, reproducible workflow. Future work will investigate counterfactual evaluation methods to measure post-refresh traffic recovery and multi-task learning architectures that jointly predict click-through rate shifts and keyword ranking volatility.
+        </p>
+      </section>
+
+      <!-- Section 10: Acknowledgments & Data Credit (Mandatory flyrank.ai link) -->
       <section id="acknowledgments">
-        <h2>9. Acknowledgments & Data Credit</h2>
+        <h2>10. Acknowledgments & Data Credit</h2>
         <div class="credit-box">
           <p style="margin-bottom: 0.5rem; font-weight: 600;">Data Attribution Notice:</p>
           <p style="margin-bottom: 0;">
@@ -1002,15 +1014,27 @@
         </div>
       </section>
 
-      <!-- Section 10: References -->
+      <!-- Section 11: References -->
       <section id="references">
-        <h2>10. References</h2>
+        <h2>11. References</h2>
         <ol class="references-list">
           <li>Breiman, L. (2001). Random Forests. <em>Machine Learning</em>, 45(1), 5–32. <a href="https://doi.org/10.1023/A:1010933404324" target="_blank" rel="noopener">doi:10.1023/A:1010933404324</a>.</li>
           <li>Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. <em>Journal of Machine Learning Research</em>, 12, 2825–2830.</li>
+          <li>Kaufman, S., Rosset, S., Perlich, C., & Stitelman, O. (2012). Leakage in data mining: Formulation, detection, and avoidance. <em>ACM TKDD</em>, 6(4), 1–21.</li>
           <li>Chawla, N. V., Bowyer, K. W., Hall, L. O., & Kegelmeyer, W. P. (2002). SMOTE: Synthetic Minority Over-sampling Technique. <em>Journal of Artificial Intelligence Research</em>, 16, 321–357.</li>
-          <li>Kaufman, S., Rosset, S., Perlich, C., & Stitelman, O. (2012). Leakage in data mining: Formulation, detection, and avoidance. <em>ACM Transactions on Knowledge Discovery from Data</em>, 6(4), 1–21.</li>
-          <li>Google Search Central. (2024). Creating helpful, reliable, people-first content. Official Google Documentation. <a href="https://developers.google.com/search/docs/fundamentals/creating-helpful-content" target="_blank" rel="noopener">developers.google.com</a>.</li>
+          <li>Radlinski, F., & Craswell, N. (2010). Comparing the Sensitivity of Information Retrieval Metrics. In <em>SIGIR '10</em>, pp. 667–674.</li>
+          <li>Joachims, T., Granka, L., Pan, B., Hembrooke, H., Radlinski, F., & Gay, G. (2017). Accurately Interpreting Clickthrough Data as Implicit Feedback. <em>ACM SIGIR Forum</em>, 51(1), 4–11.</li>
+          <li>Craswell, N., Zoeter, O., Taylor, M., & Ramsey, B. (2008). An Experimental Comparison of Click Position-Bias Models. In <em>WSDM '08</em>, pp. 87–94.</li>
+          <li>Agichtein, E., Brill, E., & Dumais, S. (2006). Improving Web Search Ranking by Incorporating User Behavior Information. In <em>SIGIR '06</em>, pp. 19–26.</li>
+          <li>Liu, T.-Y. (2009). Learning to Rank for Information Retrieval. <em>Foundations and Trends in Information Retrieval</em>, 3(3), 225–331.</li>
+          <li>Chapelle, O., & Chang, Y. (2011). Yahoo! Learning to Rank Challenge Overview. <em>JMLR W&CP</em>, 14, 1–24.</li>
+          <li>Chen, T., & Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. In <em>KDD '16</em>, pp. 785–794.</li>
+          <li>Sculley, D., et al. (2015). Hidden Technical Debt in Machine Learning Systems. In <em>NeurIPS 2015</em>, pp. 2503–2511.</li>
+          <li>Fawcett, T. (2006). An Introduction to ROC Analysis. <em>Pattern Recognition Letters</em>, 27(8), 861–874.</li>
+          <li>Guyon, I., & Elisseeff, A. (2003). An Introduction to Variable and Feature Selection. <em>JMLR</em>, 3, 1157–1182.</li>
+          <li>Kohavi, R. (1995). A Study of Cross-Validation and Bootstrap for Accuracy Estimation and Model Selection. In <em>IJCAI '95</em>, pp. 1137–1145.</li>
+          <li>Provost, F., Fawcett, T., & Kohavi, R. (1998). The Case Against Accuracy Estimation for Comparing Induction Algorithms. In <em>ICML '98</em>, pp. 445–453.</li>
+          <li>Google Search Central. (2024). Creating helpful, reliable, people-first content. <a href="https://developers.google.com/search/docs/fundamentals/creating-helpful-content" target="_blank" rel="noopener">developers.google.com</a>.</li>
           <li>FlyRank Applied AI Research Group. (2026). Applied Search Intelligence: Longitudinal Performance and Ranking Stability Across Enterprise Search Portfolios. Technical Whitepaper, March 2026.</li>
         </ol>
       </section>
