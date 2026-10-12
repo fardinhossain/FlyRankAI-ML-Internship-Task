@@ -4,6 +4,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 from ml_utils import OUTPUT_DIR, RAW_PATH, ROOT, read_json
 
 
