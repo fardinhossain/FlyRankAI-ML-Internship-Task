@@ -594,14 +594,14 @@
         <div class="abstract-box">
           <div class="abstract-title">Abstract</div>
           <p class="abstract-text">
-            In large-scale organic search, published content experiences continuous, silent traffic decay that human editorial teams cannot manually triage across tens of thousands of URLs.
-            We investigate whether supervised machine learning classifiers trained on multi-signal search performance can prioritize content refresh candidates more effectively than deterministic heuristic rules on newly onboarded domains.
-            Using an audited 30,000-page mature content slice derived from FlyRank's 78.8-million-record warehouse release across 32 client domains, we engineered 27 observable search features under a strictly isolated client-grouped split with zero domain overlap.
-            On unseen client domains, supervised models achieved a measured Precision@50 of 0.680 to 0.780 (compared to the 0.511 holdout base rate), delivering a +126% to +160% relative precision lift over the deterministic Week-4 baseline heuristic (0.300).
-            We operationalized these predictions into an evidence-backed editorial action playbook that scales decay probability by search demand volume, routes URLs to five inspectable action categories with explainable reason codes, and establishes human-in-the-loop governance guardrails.
+            On large websites, published articles slowly lose their search ranking and traffic on Google over time.
+            We study whether machine learning models can help human editors find and prioritize which old pages to refresh on new websites.
+            Using 30,000 mature web pages across 32 client accounts from FlyRank's search database, we tested multiple models using a client-grouped split where test websites were completely unseen during training.
+            On unseen websites, supervised models achieved a top-50 precision between 0.640 and 0.780, beating the simple rule baseline score of 0.300 by more than double.
+            We turned these predictions into an easy-to-use content action playbook that sorts pages by traffic potential and explains why each page needs review.
           </p>
           <div class="keywords-block">
-            <strong>Keywords:</strong> Search Engine Optimization (SEO), Machine Learning Triage, Content Refresh Prioritization, Client-Grouped Validation, Leakage Auditing, Decision-Support Systems.
+            <strong>Keywords:</strong> Search Engine Optimization (SEO), Machine Learning Triage, Content Refresh Prioritization, Client-Grouped Validation, Decision Support, Editorial Workflow.
           </div>
         </div>
       </section>
@@ -610,22 +610,22 @@
       <section id="introduction">
         <h2>1. Introduction & Problem Statement</h2>
         <p>
-          In modern search intelligence, organic traffic is an enterprise's most compounding yet perishable asset. Once published, articles inevitably encounter competitive displacement, algorithm updates, and topical obsolescence. This decay process is silent: a Page 1 URL slipping from position 4 to position 11 sheds over 70% of its organic click-through rate before human stakeholders detect the decline in aggregate analytics dashboards.
+          Website traffic from Google search is one of the most valuable sources of visitors for a business. However, older articles naturally lose rank over time due to new competitors, changing search trends, and search engine updates. When an article drops from rank 4 to rank 11 on Google, it can lose over 70% of its clicks.
         </p>
         <p>
-          The core business bottleneck is <strong>editorial capacity allocation</strong>. While an enterprise portfolio may manage between 10,000 and 50,000 indexed URLs, an editorial sprint can realistically audit, fact-check, and rewrite only 20 to 50 articles per week. Identifying which 50 URLs offer the highest protected return on editorial investment represents a high-stakes ranking challenge.
+          The biggest challenge for content teams is <strong>limited time</strong>. An enterprise website may have 30,000 published pages, but writers can only carefully update 20 to 50 pages each week. Teams need an accurate way to pick the 50 pages where updates will protect the most traffic.
         </p>
-        <h3>The Failure of Hand-Written Rules</h3>
+        <h3>Why Simple Hand-Written Rules Fail</h3>
         <p>
-          Historically, content operations rely on deterministic heuristic rules, such as flagging all pages where <em>content age exceeds 90 days</em> or <em>SERP position sits between 11 and 20</em>. However, heuristic thresholding suffers from three fundamental structural weaknesses:
+          Historically, content teams rely on simple hand-written rules, such as flagging all pages where <em>content age exceeds 90 days</em> or <em>Google position is between 11 and 20</em>. These fixed rules fail for three main reasons:
         </p>
         <ul>
-          <li><strong>Domain Confounding:</strong> Fixed staleness cutoffs behave inconsistently across different domain authorities. An authoritative enterprise domain retains Page 1 rankings despite 200 days of staleness, whereas a low-authority domain slips within weeks.</li>
-          <li><strong>Step-Function Cliffs:</strong> A rule assigning weight only when position is $\le 20$ creates an arbitrary cliff, ignoring rich non-linear interactions between impressions, dwell engagement, and keyword volume.</li>
-          <li><strong>Demand Disconnect:</strong> Pure decay indicators frequently flag dormant deep-SERP URLs (position 40) that command zero real-world commercial leverage.</li>
+          <li><strong>Big vs. Small Websites:</strong> A large authority website can keep its rank for months without updates, while a smaller website loses traffic quickly.</li>
+          <li><strong>Rigid Cutoffs:</strong> Hard rules like "age over 90 days" ignore whether a page still gets thousands of views or zero views.</li>
+          <li><strong>Low-Value Pages:</strong> Simple rules often flag dead pages on Page 4 of Google that have no real visitors, wasting valuable writer time.</li>
         </ul>
         <p>
-          <strong>Research Question:</strong> <em>Can a supervised machine learning classifier, trained on observable multi-signal search features without target leakage, outperform deterministic heuristic baseline rules in ranking candidate URLs for editorial refresh on completely unseen client domains?</em>
+          <strong>Research Question:</strong> <em>Can a supervised machine learning model, trained on observable search signals without data leakage, beat simple heuristic rules at finding pages that need refreshing on brand-new websites?</em>
         </p>
       </section>
 
