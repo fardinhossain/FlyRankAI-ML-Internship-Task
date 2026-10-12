@@ -596,10 +596,10 @@
           <div class="abstract-title">Abstract</div>
           <p class="abstract-text">
             On large websites, published articles slowly lose their search ranking and traffic on Google over time.
-            We study whether machine learning models can help human editors find and prioritize which old pages to refresh on new websites.
-            Using 30,000 mature web pages across 32 client accounts from FlyRank's search database, we tested multiple models using a client-grouped split where test websites were completely unseen during training.
+            This study evaluates whether machine learning models can assist human editors in identifying and prioritizing which mature pages to refresh on new websites.
+            Using 30,000 mature web pages across 32 client accounts from FlyRank's search database, multiple models were evaluated under a client-grouped split where test websites were completely unseen during training.
             On unseen websites, supervised models achieved a top-50 precision between 0.640 and 0.780, beating the simple rule baseline score of 0.300 by more than double.
-            We turned these predictions into an easy-to-use content action playbook that sorts pages by traffic potential and explains why each page needs review.
+            These predictions were operationalized into an interpretable content action playbook that sorts pages by traffic potential and explains why each page needs review.
           </p>
           <div class="keywords-block">
             <strong>Keywords:</strong> Search Engine Optimization (SEO), Machine Learning Triage, Content Refresh Prioritization, Client-Grouped Validation, Decision Support, Editorial Workflow.
@@ -634,7 +634,7 @@
       <section id="data">
         <h2>2. Data Contract & Governance</h2>
         <p>
-          Our empirical investigation builds upon the <strong>FlyRank AI/ML Internship Warehouse Release</strong> (build <code>v20260703</code>) hosted on Hugging Face at <a href="https://huggingface.co/datasets/FlyRank/internship-warehouse" target="_blank" rel="noopener"><code>FlyRank/internship-warehouse</code></a>. The full warehouse comprises 78,835,655 daily performance fact records, 519,606 unique content dimensions, and 104 client tracking portfolios spanning a 17-month observation period (2025-01-27 to 2026-06-30).
+          This empirical investigation builds upon the <strong>FlyRank AI/ML Internship Warehouse Release</strong> (build <code>v20260703</code>) hosted on Hugging Face at <a href="https://huggingface.co/datasets/FlyRank/internship-warehouse" target="_blank" rel="noopener"><code>FlyRank/internship-warehouse</code></a>. The full warehouse comprises 78,835,655 daily performance fact records, 519,606 unique content dimensions, and 104 client tracking portfolios spanning a 17-month observation period (2025-01-27 to 2026-06-30).
         </p>
         <div class="table-caption">Table 1: Multi-Table Warehouse Provenance & Experimental Working Slice</div>
         <div class="table-container">
@@ -683,7 +683,7 @@
 
         <h3>The Mature Content Specification</h3>
         <p>
-          To maintain scientific integrity, we enforce the data contract established in Week 3 (ML-04). We deliberately filter the portfolio to the <strong>mature content slice</strong> satisfying:
+          To maintain scientific integrity, the data contract established in Week 3 (ML-04) is enforced. The pipeline deliberately filters the portfolio to the <strong>mature content slice</strong> satisfying:
         </p>
         <div class="equation-box">
           Population Filter: impressions_90d > 0 &nbsp;&amp;&nbsp; content_age_days &ge; 90
@@ -701,12 +701,12 @@
       <section id="methodology">
         <h2>3. Methodology & Leakage Audit</h2>
         <p>
-          We construct an honest machine learning pipeline adhering to the rigorous guidelines in FlyRank's <code>hunting-leakage-and-validating</code> skill.
+          An honest machine learning pipeline was constructed adhering to the rigorous guidelines in FlyRank's <code>hunting-leakage-and-validating</code> skill.
         </p>
 
         <h3>Feature Matrix Assembly ($X$)</h3>
         <p>
-          We engineered 27 observable features available at the moment of editorial triage ($t = 0$):
+          A total of 27 observable features were extracted available at the moment of editorial triage ($t = 0$):
         </p>
         <ul>
           <li><strong>Search Demand & Velocity:</strong> <code>log_impressions_90d</code>, <code>log_clicks_90d</code>, <code>log_sessions_90d</code>, <code>days_with_impressions</code>, <code>days_with_sessions</code>, <code>search_volume</code>, <code>cpc</code>.</li>
@@ -718,8 +718,8 @@
 
         <h3>The Adversarial Leakage Confession Test</h3>
         <p>
-          The most insidious failure mode in applied search ML is label leakage. In our dataset, the binary label <code>is_declining_label</code> is derived from <code>trend_direction</code>, which is computed directly from <code>trend_pct</code>.
-          To guarantee that our test harness is sensitive to leakage, we performed a controlled confession test:
+          The most insidious failure mode in applied search ML is label leakage. In the analytical dataset, the binary label <code>is_declining_label</code> is derived from <code>trend_direction</code>, which is computed directly from <code>trend_pct</code>.
+          To verify that the validation pipeline is sensitive to leakage, an Intentional Leakage Sanity Check was performed:
         </p>
         <ul>
           <li><strong>Trained WITH Leaky Sibling (<code>trend_pct</code>):</strong> ROC-AUC jumped to an unnatural <strong>1.0000</strong> and Average Precision hit <strong>1.0000</strong>.</li>
@@ -732,7 +732,7 @@
           Random row-level splitting (<code>train_test_split</code>) in search intelligence produces catastrophic leakage: pages from the same client domain share internal link architecture, domain authority, and tracking setup. When the model encounters the same domain in both splits, it memorizes client traits rather than generalizable search dynamics.
         </p>
         <p>
-          We enforce a <strong>Client-Grouped Split (<code>GroupShuffleSplit</code> on <code>client_id</code>)</strong>:
+          Validation relies on a <strong>Client-Grouped Split (<code>GroupShuffleSplit</code> on <code>client_id</code>)</strong>:
         </p>
         <ul>
           <li><strong>Training Partition:</strong> 23,837 pages across 25 client accounts (Base Rate: 0.550).</li>
@@ -745,7 +745,7 @@
       <section id="results">
         <h2>4. Experimental Results</h2>
         <p>
-          All models and the deterministic baseline rule were evaluated on the exact same 6,163 held-out pages from 7 unseen client domains. Because editorial bandwidth is fixed, our primary operational metric is <strong>Precision@50</strong> (the proportion of the top 50 surfaced candidate URLs that are true declining assets requiring intervention).
+          All models and the deterministic baseline rule were evaluated on the exact same 6,163 held-out pages from 7 unseen client domains. Because editorial bandwidth is fixed, the primary operational metric is <strong>Precision@50</strong> (the proportion of the top 50 surfaced candidate URLs that are true declining assets requiring intervention).
         </p>
 
         <div class="table-caption">Table 2: Unified Model vs. Baseline Comparison on Unseen Client Holdout (N = 6,163)</div>
@@ -798,19 +798,19 @@
           </table>
         </div>
         <p style="font-size: 0.875rem; color: var(--text-light); margin-top: -1rem;">
-          *Note: When Random Forest decay probability is multiplied by logarithmic demand volume in our Composite Action Score, Precision@50 rises to <strong>0.980</strong> (49/50 true declining assets caught).
+          *Note: When Random Forest decay probability is multiplied by logarithmic demand volume in the Composite Action Score, Precision@50 rises to <strong>0.980</strong> (49/50 true declining assets caught).
         </p>
 
         <h3>Before vs. After Validation Contrast</h3>
         <p>
-          To quantify the degree of memorization in standard ML workflows, we evaluated Random Forest under both naive random splitting and honest grouped splitting:
+          To quantify the degree of memorization in standard ML workflows, Random Forest was evaluated under both naive random splitting and honest grouped splitting:
         </p>
         <ul>
           <li><strong>Naive Random Row Split:</strong> Precision@50 = <strong>1.000</strong>, ROC-AUC = <strong>0.775</strong>. (Artificially inflated by 31 leaking client accounts).</li>
           <li><strong>Honest Grouped Client Split:</strong> Precision@50 = <strong>0.640</strong>, ROC-AUC = <strong>0.610</strong>.</li>
         </ul>
         <p>
-          This gap is a primary finding: models evaluated on random row splits appear near-flawless offline but suffer domain transfer degradation when exposed to newly onboarded domains. Even after accounting for this penalty, our trained models still deliver a <strong>+113% to +160% relative lift</strong> over the baseline rule (0.640–0.780 vs. 0.300).
+          This gap is a primary finding: models evaluated on random row splits appear near-flawless offline but suffer domain transfer degradation when exposed to newly onboarded domains. Even after accounting for this penalty, the trained models still deliver a <strong>+113% to +160% relative lift</strong> over the baseline rule (0.640–0.780 vs. 0.300).
         </p>
 
         <!-- Figures -->
@@ -835,7 +835,7 @@
       <section id="discussion">
         <h2>5. Discussion & Physical Search Mechanisms</h2>
         <p>
-          Examining the Gini feature importances of our Random Forest model reveals the underlying search dynamics driving organic decay:
+          Examining the Gini feature importances of the Random Forest model reveals the underlying search dynamics driving organic decay:
         </p>
         <ol>
           <li><strong><code>avg_position</code> (12.3%):</strong> The SERP position cliff is the dominant physical determinant of traffic loss. A drop from position 3 to position 7 produces an exponential loss in click share.</li>
@@ -857,13 +857,13 @@
       <section id="limitations">
         <h2>6. Limitations & Honest Claim Framing</h2>
         <p>
-          In accordance with our claim ladder (<strong>observed</strong>, <strong>measured</strong>, <strong>directional</strong>, <strong>decision-support</strong>), we document the precise scientific boundaries of our findings:
+          In accordance with the rigorous claim ladder (<strong>observed</strong>, <strong>measured</strong>, <strong>directional</strong>, <strong>decision-support</strong>), the precise scientific boundaries of the findings are documented:
         </p>
         <div class="alert-box alert-warn">
           <strong>Non-Causal Observational Data:</strong> This research demonstrates that machine learning models effectively <em>prioritize</em> candidate pages exhibiting decay patterns. It does <strong>not</strong> prove that updating an article guarantees traffic recovery. In observational data, historical refreshes suffer from editorial selection bias (human editors selectively update articles with high latent commercial value).
         </div>
         <ul>
-          <li><strong>No Algorithm Reverse-Engineering:</strong> We make no claim to have modeled Google's proprietary ranking algorithm. We modeled empirical performance metrics across 32 client tracking setups.</li>
+          <li><strong>No Algorithm Reverse-Engineering:</strong> This study does not claim to model Google's proprietary ranking algorithm. The study models empirical performance metrics across 32 client tracking setups.</li>
           <li><strong>Mature Content Boundary:</strong> Predictions are uncalibrated for newly published URLs under 90 days of age.</li>
           <li><strong>Skeptic's Error Case Analysis:</strong>
             <ul>
@@ -964,7 +964,7 @@
       <section id="reproducibility">
         <h2>8. Reproducibility & Research Artifacts</h2>
         <p>
-          Every table, metric, and figure in this paper is completely reproducible from the committed code and notebooks in our repository.
+          Every table, metric, and figure in this paper is completely reproducible from the committed code and notebooks in the repository.
         </p>
         <ul>
           <li><strong>GitHub Repository:</strong> <a href="https://github.com/fardinhossain/FlyRankAI-ML-Internship-Task" target="_blank" rel="noopener">fardinhossain/FlyRankAI-ML-Internship-Task</a></li>
@@ -997,10 +997,10 @@
       <section id="conclusion">
         <h2>9. Conclusion</h2>
         <p>
-          This study evaluated machine learning models for prioritizing organic search content refresh on unseen client websites. By analyzing 30,000 mature URLs across 32 client accounts from an industrial search warehouse, we showed that supervised classifiers achieve a top-50 triage precision of 0.640 to 0.780 under honest client-grouped validation, outperforming deterministic heuristic rules (0.300) by more than double. Combining predicted decay probabilities with search demand in a composite Action Score elevated top-50 precision to 0.980, ensuring that human editorial hours are directed toward high-value pages.
+          This study evaluated machine learning models for prioritizing organic search content refresh on unseen client websites. By analyzing 30,000 mature URLs across 32 client accounts from an industrial search warehouse, the results showed that supervised classifiers achieve a top-50 triage precision of 0.640 to 0.780 under honest client-grouped validation, outperforming deterministic heuristic rules (0.300) by more than double. Combining predicted decay probabilities with search demand in a composite Action Score elevated top-50 precision to 0.980, ensuring that human editorial hours are directed toward high-value pages.
         </p>
         <p>
-          Our findings underscore that naive random validation causes severe domain memorization and that practical deployment requires grouping data by client domain. In operational practice, decision-support machine learning transforms content refresh from subjective guesswork into an evidence-based, reproducible workflow. Future work will investigate counterfactual evaluation methods to measure post-refresh traffic recovery and multi-task learning architectures that jointly predict click-through rate shifts and keyword ranking volatility.
+          The findings underscore that naive random validation causes severe domain memorization and that practical deployment requires grouping data by client domain. In operational practice, decision-support machine learning transforms content refresh from subjective guesswork into an evidence-based, reproducible workflow. Future work will investigate counterfactual evaluation methods to measure post-refresh traffic recovery and multi-task learning architectures that jointly predict click-through rate shifts and keyword ranking volatility.
         </p>
       </section>
 
@@ -1011,7 +1011,7 @@
           <p style="margin-bottom: 0.5rem; font-weight: 600;">Data Attribution Notice:</p>
           <p style="margin-bottom: 0;">
             This research was <strong>Built on the <a href="https://flyrank.ai/" target="_blank" rel="noopener">FlyRank ML Internship dataset</a></strong>.
-            We gratefully acknowledge the FlyRank engineering and data intelligence teams for provisioning the pseudonymized production search and engagement release (78.8M daily performance records across 104 client domains) under safe educational terms.
+            The author gratefully acknowledges the FlyRank engineering and data intelligence teams for provisioning the pseudonymized production search and engagement release (78.8M daily performance records across 104 client domains) under safe educational terms.
             FlyRank does not endorse the specific model architectures or operational conclusions presented herein.
           </p>
         </div>
