@@ -1,0 +1,48 @@
+{
+  "audit_type": "ML-09 Validation and Research Claim Audit",
+  "slice_size": 30000,
+  "n_clients": 32,
+  "before_after_comparison": [
+    {
+      "Split Design": "Naive Random Row Split",
+      "Client Overlap": "31 clients (100% leaked)",
+      "Test Base Rate": 0.545,
+      "Precision@50": 1.0,
+      "Avg Precision": 0.796,
+      "ROC-AUC": 0.775,
+      "Recall": 0.8,
+      "F1": 0.746
+    },
+    {
+      "Split Design": "Honest Grouped Client Split",
+      "Client Overlap": "0 clients (0% leaked)",
+      "Test Base Rate": 0.511,
+      "Precision@50": 0.64,
+      "Avg Precision": 0.598,
+      "ROC-AUC": 0.61,
+      "Recall": 0.669,
+      "F1": 0.619
+    },
+    {
+      "Split Design": "Baseline Rules (on Grouped Split)",
+      "Client Overlap": "0 clients (0% leaked)",
+      "Test Base Rate": 0.511,
+      "Precision@50": 0.3,
+      "Avg Precision": 0.522,
+      "ROC-AUC": 0.538,
+      "Recall": "-",
+      "F1": "-"
+    }
+  ],
+  "leakage_audit": {
+    "with_leaky_trend_pct_auc": 1.0,
+    "without_leaky_trend_pct_auc": 0.6097,
+    "max_feature_correlation": 0.1901
+  },
+  "safe_claim_language": [
+    "observed",
+    "measured",
+    "directional",
+    "decision-support"
+  ]
+}
