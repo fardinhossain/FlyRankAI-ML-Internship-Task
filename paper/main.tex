@@ -22,18 +22,18 @@
 \title{Decision-Support Content Refresh Prioritization on Unseen Client Domains: An Empirical Machine Learning Approach}
 
 \author{
-\IEEEauthorblockN{Fardin Hossain}
-\IEEEauthorblockA{\textit{FlyRank AI/ML Research Internship} \\
+\IEEEauthorblockN{Md. Fardin Hossain}
+\IEEEauthorblockA{\textit{FlyRankAI Machine Learning Internship} \\
 \textit{Applied Search Intelligence Track}\\
 Dhaka, Bangladesh \\
-fardin.hossain.ai@gmail.com}
+fardin.hosn@gmail.com}
 }
 
 \maketitle
 
 \begin{abstract}
 For large-scale websites, mature articles often suffer from gradual search visibility erosion and organic traffic decay on search engines over time.
-Because human writing teams cannot manually check thousands of published pages each week, this study investigates whether supervised machine learning models can accurately identify and prioritize decaying content candidates across unseen client websites.
+Because editorial teams cannot manually check thousands of published pages each week, this study investigates whether supervised machine learning models can accurately identify and prioritize decaying content candidates across unseen client websites.
 To evaluate this approach, a leak-free dataset of 30,000 mature web pages was constructed across 32 client accounts from FlyRank's 78.8-million-row search database, validating candidate models under a client-grouped holdout partition with strictly isolated test domains.
 Under this rigorous evaluation on unseen clients, standalone supervised classifiers achieved top-50 precision between 0.640 and 0.780—more than doubling the 0.300 precision of heuristic baseline rules—while combining predicted decay probabilities with search demand in a composite Action Score reached a top-50 precision of 0.980.
 Finally, these model outputs were operationalized into an interpretable editorial action playbook featuring diagnostic reason codes and human-in-the-loop safety rules, transforming ad-hoc content maintenance into a reliable decision-support system.
