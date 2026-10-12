@@ -570,7 +570,8 @@
         <li><a href="#reproducibility" class="toc-link">8. Reproducibility & Artifacts</a></li>
         <li><a href="#conclusion" class="toc-link">9. Conclusion</a></li>
         <li><a href="#acknowledgments" class="toc-link">10. Acknowledgments & Credit</a></li>
-        <li><a href="#references" class="toc-link">11. References</a></li>
+        <li><a href="#showcase" class="toc-link" style="color: #047857; font-weight: 600;">🎙️ 11. ML-12 Demo & Story</a></li>
+        <li><a href="#references" class="toc-link">12. References</a></li>
       </ul>
     </aside>
 
@@ -643,8 +644,8 @@
         <div class="abstract-box">
           <div class="abstract-title">Abstract</div>
           <p class="abstract-text">
-            For large-scale websites, mature articles often suffer from gradual search visibility erosion and organic traffic decay on search engines over time.
-            Because editorial teams cannot manually check thousands of published pages each week, this study investigates whether supervised machine learning models can accurately identify and prioritize decaying content candidates across unseen client websites.
+            For enterprise search intelligence platforms and digital publishers managing large-scale websites, mature articles often suffer from gradual search visibility erosion and organic traffic decay on search engines over time.
+            Addressing the real-world content refresh bottleneck in FlyRank's multi-client operations—where editorial teams can manually revise only a small fraction of published pages each week—this study investigates whether supervised machine learning models can accurately identify and prioritize decaying content candidates across unseen client websites.
             To evaluate this approach, a leak-free dataset of 30,000 mature web pages was constructed across 32 client accounts from FlyRank's 78.8-million-row search database, validating candidate models under a client-grouped holdout partition with strictly isolated test domains.
             Under this rigorous evaluation on unseen clients, standalone supervised classifiers achieved top-50 precision between 0.420 and 0.780 (0.680 for Random Forest)—more than doubling the 0.300 precision of heuristic baseline rules—while combining predicted decay probabilities with search demand in a composite Action Score reached a top-50 precision of 0.980.
             Finally, these model outputs were operationalized into an interpretable editorial action playbook featuring diagnostic reason codes and human-in-the-loop safety rules, transforming ad-hoc content maintenance into a reliable decision-support system.
@@ -664,6 +665,9 @@
         <p>
           The biggest challenge for content teams is <strong>limited time</strong>. An enterprise website may have 30,000 published pages, but writers can only carefully update 20 to 50 pages each week. Teams need an accurate way to pick the 50 pages where updates will protect the most traffic.
         </p>
+        <div class="alert-box alert-info">
+          <strong>The FlyRank Enterprise Case Study:</strong> In multi-tenant search intelligence operations at FlyRank, content strategists manage portfolios across dozens of enterprise client accounts spanning e-commerce, SaaS, and digital publishing. Onboarding a newly contracted client domain creates an immediate Monday-morning triage bottleneck: out of thousands of published articles, which 50 URLs should the content team revise this week to prevent organic traffic loss? Because editorial capacity is strictly capped at 20–50 URLs per sprint, ranking precision directly dictates client ROI and search traffic preservation.
+        </div>
         <h3>Why Simple Hand-Written Rules Fail</h3>
         <p>
           Historically, content teams rely on simple hand-written rules, such as flagging all pages where <em>content age exceeds 90 days</em> or <em>Google position is between 11 and 20</em>. These fixed rules fail for three main reasons:
@@ -1066,9 +1070,80 @@
         </div>
       </section>
 
-      <!-- Section 11: References -->
+      <!-- Section 11: ML-12 Demo Outline & Shareable Cuts -->
+      <section id="showcase">
+        <h2>11. Tell the Story — 5-Minute Demo Outline & Shareable Cuts</h2>
+        <p>
+          To make this research accessible across diverse technical, editorial, and executive audiences, this section provides the structured presentation cuts of the work:
+        </p>
+
+        <h3>The 5-Minute Technical Showcase Walkthrough</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          A minute-by-minute presentation plan covering the core question, methodology, key visual artifact, honest validation findings, and operational playbook:
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 15%;">Segment</th>
+                <th style="width: 25%;">Showcase Focus</th>
+                <th>Talking Points & Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Minute 1</strong></td>
+                <td><strong>The Question & FlyRank Dilemma</strong></td>
+                <td>Mature search content decays silently as competitors update articles and search algorithms evolve. With editorial teams limited to 20–50 URLs per weekly sprint out of 30,000+ pages, hand-written rules fail. <em>Question: Can supervised ML prioritize decaying candidates on unseen client domains without leakage?</em></td>
+              </tr>
+              <tr>
+                <td><strong>Minute 2</strong></td>
+                <td><strong>The Method & Grouped Split</strong></td>
+                <td>Evaluated 30,000 mature URLs across 32 client accounts from FlyRank's 78.8M-row search warehouse. Assembled 27 leak-free features at $t=0$. Grouped by <code>client_id</code> (25 train / 7 test) with strictly zero domain overlap to evaluate honest Day-1 client onboarding.</td>
+              </tr>
+              <tr>
+                <td><strong>Minute 3</strong></td>
+                <td><strong>One Chart: Cost/Value Matrix</strong></td>
+                <td>Presented Figure 1 (Cost/Value Matrix). The upper-right quadrant isolates high-demand, high-decay URLs. Multiplying predicted decay probability by search demand filters out noisy 1-impression false negatives.</td>
+              </tr>
+              <tr>
+                <td><strong>Minute 4</strong></td>
+                <td><strong>One Honest Result & The Split Gap</strong></td>
+                <td>Supervised models more than double baseline precision on unseen domains: Logistic Regression reaches 0.780 and Random Forest reaches 0.680 P@50 vs. Baseline 0.300 (+127% to +160% lift). Action Score achieves 0.980. <em>The Honest Caveat:</em> Naive random splits produced an artificial 1.000 P@50 due to client memorization, proving grouped validation is mandatory.</td>
+              </tr>
+              <tr>
+                <td><strong>Minute 5</strong></td>
+                <td><strong>One Recommendation & Guardrails</strong></td>
+                <td>Mapped predictions into an operational 5-tier playbook with human-readable reason codes (24.7% title/CTR review, 27.7% factual refresh). Enforced strict governance guardrails: no autonomous publishing, no auto 301 redirects, mandatory expert sign-off.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Shareable Cut 1: The Social-Post Cut</h3>
+        <div class="alert-box alert-info" style="font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6;">
+          <p><strong>Can machine learning beat hand-written rules for content refresh triage on 30,000 search pages? 🔍📉</strong></p>
+          <p>In enterprise SEO, high-ranking articles decay silently over time. Editorial bandwidth is finite—teams can realistically update only 20 to 50 URLs each week. Most organizations rely on rigid rules like "refresh if older than 90 days," but fixed rules fail on newly onboarded domains because they ignore domain authority, ranking leverage, and actual search demand.</p>
+          <p>For my <strong>FlyRank AI/ML Capstone</strong>, I engineered and audited an evidence-based content opportunity triage model across 30,000 mature URLs and 32 client accounts from FlyRank's 78.8-million-row search performance warehouse:</p>
+          <ul>
+            <li>📊 <strong>What the data showed:</strong> Supervised classifiers achieved <strong>0.680–0.780 Precision@50</strong> on unseen client domains—a <strong>+127% to +160% relative lift</strong> over heuristic baseline rules (0.300). Demand-weighted Action Scores reached <strong>0.980</strong>.</li>
+            <li>⚠️ <strong>The honest validation gap:</strong> Naive random row splits yielded an inflated 1.000 Precision@50 due to client memorization, proving that strict client-grouped validation is non-negotiable.</li>
+            <li>🛡️ <strong>The operational principle:</strong> ML should not replace human writers—it powers an intelligent decision-support triage queue with inspectable reason codes and strict governance guardrails (no autonomous publishing!).</li>
+          </ul>
+          <p style="margin-bottom: 0;"><em>Built on the FlyRank ML Internship dataset.</em></p>
+        </div>
+
+        <h3>Shareable Cut 2: The 3-Sentence Employer Summary</h3>
+        <div class="alert-box alert-warn" style="font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.7;">
+          <p style="margin-bottom: 0.5rem;"><strong>1. What I built:</strong> I engineered and deployed an evidence-based machine learning ranking system that identifies and prioritizes decaying content candidates for weekly editorial refresh sprints across enterprise client domains.</p>
+          <p style="margin-bottom: 0.5rem;"><strong>2. On what data:</strong> The pipeline was trained and evaluated on 30,000 mature web pages across 32 client accounts from FlyRank's 78.8-million-row search warehouse under strict client-grouped holdout validation with zero domain leakage.</p>
+          <p style="margin-bottom: 0;"><strong>3. What it showed:</strong> The empirical results showed that supervised models deliver a measured +127% to +160% relative lift in top-50 precision over deterministic baseline rules on completely unseen domains (0.680–0.780 vs. 0.300, reaching 0.980 when combined with search demand), successfully operationalized into an interpretable editorial playbook with transparent reason codes and human-in-the-loop safety guardrails.</p>
+        </div>
+      </section>
+
+      <!-- Section 12: References -->
       <section id="references">
-        <h2>11. References</h2>
+        <h2>12. References</h2>
         <ol class="references-list">
           <li>Breiman, L. (2001). Random Forests. <em>Machine Learning</em>, 45(1), 5–32. <a href="https://doi.org/10.1023/A:1010933404324" target="_blank" rel="noopener">doi:10.1023/A:1010933404324</a>.</li>
           <li>Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. <em>Journal of Machine Learning Research</em>, 12, 2825–2830.</li>
