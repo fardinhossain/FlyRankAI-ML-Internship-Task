@@ -64,7 +64,7 @@ This paper provides four primary contributions:
 \begin{itemize}
     \item Construction of an anonymized benchmark dataset containing 30,000 mature URLs across 32 client accounts from an industrial 78.8-million-row warehouse release.
     \item Demonstration that naive random splits yield an artificial 1.000 top-50 precision due to domain memorization, establishing that client-grouped validation is mandatory.
-    \item Empirical evidence that supervised models more than double baseline triage precision on unseen domains (0.640--0.780 vs. 0.300), reaching 0.980 when combined with search demand in a composite Action Score.
+    \item Empirical evidence that supervised models more than double baseline triage precision on unseen domains (0.420--0.780 vs. 0.300, 0.680 for Random Forest), reaching 0.980 when combined with search demand in a composite Action Score.
     \item Design of an interpretable editorial playbook with five action archetypes, diagnostic reason codes, and human-in-the-loop governance guardrails.
 \end{itemize}
 
@@ -257,11 +257,11 @@ Evaluating Random Forest via standard random splitting produced an artificial Pr
 \subsection{Feature Importance Analysis}
 Random Forest Gini feature importances reveal the primary signals utilized during tree splitting:
 \begin{enumerate}
-    \item Average position (\textbf{12.3\%}): ranking position on Google, where slipping past rank 10 sharply cuts CTR.
-    \item Active impression days (\textbf{11.7\%}): consistency of search presence.
-    \item Logarithmic impressions (\textbf{11.6\%}): baseline traffic scale separating demand from background noise.
-    \item Content age in days (\textbf{7.8\%}): lifecycle duration and freshness erosion.
-    \item Character count (\textbf{6.1\%}): article length and depth of coverage.
+    \item Active impression days (\textbf{13.1\%}): consistency of search presence over time.
+    \item Logarithmic impressions (\textbf{10.7\%}): baseline traffic magnitude separating real decay from statistical noise.
+    \item Average position (\textbf{10.1\%}): physical position cliff on search engines (Page 1 vs. deep SERP).
+    \item Content age in days (\textbf{9.4\%}): content lifecycle maturity and freshness erosion.
+    \item Word count (\textbf{6.1\%}): article length and depth of coverage.
 \end{enumerate}
 Gini importance indicates feature reliance within tree splits, rather than direct physical causation in search ranking algorithms.
 
@@ -275,7 +275,7 @@ Gini importance indicates feature reliance within tree splits, rather than direc
 \section{Discussion}
 Experimental findings indicate that organic search decay does not follow arbitrary calendar schedules. Deterministic rules assume articles become obsolete after 90 days. In reality, decay is a continuous process accelerating when URLs slip to positions 11--20 while retaining active query demand. Machine learning models succeed because they learn smooth non-linear boundaries, avoiding false alarms common to rigid cutoff thresholds.
 
-Furthermore, empirical results qualify the assumption that content age is the primary driver of traffic loss. Content age accounts for only 7.8\% of predictive importance, whereas ranking position and impression consistency account for over 35\%. Articles decline not merely because of age, but when competitor coverage improves or search intent shifts. Detecting ranking erosion early enables teams to intervene before search visibility collapses.
+Furthermore, empirical results qualify the assumption that content age is the primary driver of traffic loss. Content age accounts for only 9.4\% of predictive importance, whereas ranking position and impression consistency account for nearly 34\%. Articles decline not merely because of age, but when competitor coverage improves or search intent shifts. Detecting ranking erosion early enables teams to intervene before search visibility collapses.
 
 Error analysis on unseen domains reveals two notable edge cases:
 \begin{itemize}

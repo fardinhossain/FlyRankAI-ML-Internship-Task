@@ -886,10 +886,11 @@
           Examining the Gini feature importances of the Random Forest model reveals the underlying search dynamics driving organic decay:
         </p>
         <ol>
-          <li><strong><code>avg_position</code> (12.3%):</strong> The SERP position cliff is the dominant physical determinant of traffic loss. A drop from position 3 to position 7 produces an exponential loss in click share.</li>
-          <li><strong><code>days_with_impressions</code> (11.7%):</strong> Presence consistency indicates whether search demand is actively evaporating or sustaining search interest.</li>
-          <li><strong><code>log_impressions_90d</code> (11.6%):</strong> Total traffic magnitude separates meaningful macro-slippage from stochastic single-click variance.</li>
-          <li><strong><code>content_age_days</code> (7.8%):</strong> Articles in the 180–360 day age band experience the highest vulnerability to freshness-driven decay.</li>
+          <li><strong><code>days_with_impressions</code> (13.1%):</strong> Presence consistency indicates whether search demand is actively sustaining interest or eroding.</li>
+          <li><strong><code>log_impressions_90d</code> (10.7%):</strong> Total traffic magnitude separates meaningful macro-slippage from stochastic single-click variance.</li>
+          <li><strong><code>avg_position</code> (10.1%):</strong> The SERP position cliff is a primary physical determinant of traffic loss (Page 1 vs. deep SERP).</li>
+          <li><strong><code>content_age_days</code> (9.4%):</strong> Content lifecycle maturity and freshness erosion over extended publishing horizons.</li>
+          <li><strong><code>word_count</code> (6.1%):</strong> Article length and depth of topical coverage.</li>
         </ol>
 
         <div class="figure-block">
