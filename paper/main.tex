@@ -1,343 +1,329 @@
-\documentclass[conference]{IEEEtran}
+\\documentclass[conference]{IEEEtran}
 
-\usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage{booktabs}
-\usepackage{microtype}
-\usepackage{url}
-\usepackage{hyperref}
+\\usepackage{cite}
+\\usepackage{amsmath,amssymb,amsfonts}
+\\usepackage{graphicx}
+\\usepackage{textcomp}
+\\usepackage{xcolor}
+\\usepackage{booktabs}
+\\usepackage{microtype}
+\\usepackage{url}
+\\usepackage{hyperref}
 
-\hypersetup{
+\\hypersetup{
     colorlinks=true,
     linkcolor=black,
     citecolor=blue,
     urlcolor=blue
 }
 
-\begin{document}
+% Tighten float and caption spacing to ensure strict 6-page ceiling
+\\setlength{\\textfloatsep}{5pt plus 1pt minus 1pt}
+\\setlength{\\floatsep}{5pt plus 1pt minus 1pt}
+\\setlength{\\intextsep}{5pt plus 1pt minus 1pt}
+\\setlength{\\abovecaptionskip}{3pt plus 1pt minus 1pt}
+\\setlength{\\belowcaptionskip}{3pt plus 1pt minus 1pt}
 
-\title{Decision-Support Content Refresh Prioritization on Unseen Client Domains: An Empirical Machine Learning Approach}
+% Tighten bibliography item spacing to eliminate page-7 spillover
+\\let\\oldbibliography\\thebibliography
+\\renewcommand{\\thebibliography}[1]{%
+  \\oldbibliography{#1}%
+  \\setlength{\\itemsep}{0pt plus 0.5pt}%
+  \\setlength{\\parsep}{0pt}%
+}
 
-\author{
-\IEEEauthorblockN{Md. Fardin Hossain}
-\IEEEauthorblockA{\textit{FlyRankAI Machine Learning Internship} \\
-\textit{Applied Search Intelligence Track}\\
+\\begin{document}
+
+\\title{Decision-Support Content Refresh Prioritization on Unseen Client Domains: An Empirical Machine Learning Approach}
+
+\\author{
+\\IEEEauthorblockN{Md. Fardin Hossain}
+\\IEEEauthorblockA{\\textit{FlyRankAI Machine Learning Internship} \\
+\\textit{Applied Search Intelligence Track}\\
 Dhaka, Bangladesh \\
 fardin.hosn@gmail.com}
 }
 
-\maketitle
+\\maketitle
 
-\begin{abstract}
+\\begin{abstract}
 For enterprise search intelligence platforms and digital publishers managing large-scale websites, mature articles often suffer from gradual search visibility erosion and organic traffic decay on search engines over time.
 To address the real-world content refresh bottleneck in FlyRank's multi-client operations, where editorial teams can manually revise only a small fraction of published pages each week, this study investigates whether supervised machine learning models can accurately identify and prioritize decaying content candidates across unseen client websites.
 To evaluate this approach, a leak-free dataset of 30,000 mature web pages was constructed across 32 client accounts from FlyRank's 78.8-million-row search database, validating candidate models under a client-grouped holdout partition with strictly isolated test domains.
 Under this rigorous evaluation on unseen clients, standalone supervised classifiers achieved top-50 precision between 0.420 and 0.780 (0.680 for Random Forest), which more than doubles the 0.300 precision of heuristic baseline rules, while combining predicted decay probabilities with search demand in a composite Action Score reached a top-50 precision of 0.980.
 Finally, these model outputs were operationalized into an interpretable editorial action playbook featuring diagnostic reason codes and human-in-the-loop safety rules, transforming ad-hoc content maintenance into a reliable decision-support system.
-\end{abstract}
+\\end{abstract}
 
-\begin{IEEEkeywords}
+\\begin{IEEEkeywords}
 search engine optimization, machine learning triage, content refresh, client-grouped validation, decision support systems
-\end{IEEEkeywords}
+\\end{IEEEkeywords}
 
-\section{Introduction}
-Organic search traffic from search engines represents a primary source of audience acquisition for digital publishers and enterprise platforms. While high-quality articles can maintain stable readership for extended periods, search visibility inevitably degrades as competitor content emerges, algorithms evolve, and user query phrasing shifts. This visibility loss is especially acute within top search positions: slipping from position 4 to position 11 typically causes an organic click loss exceeding 70\% \cite{radlinski2010comparing, joachims2017accurately}.
+\\section{Introduction}
+Organic search traffic from search engines represents a primary source of audience acquisition for digital publishers and enterprise platforms. While high-quality articles can maintain stable readership for extended periods, search visibility inevitably degrades as competitor content emerges, algorithms evolve, and user query phrasing shifts. This visibility loss is especially acute within top search positions: slipping from position 4 to position 11 typically causes an organic click loss exceeding 70\\% \\cite{radlinski2010comparing, joachims2017accurately}.
 
-Managing content decay poses a severe operational bottleneck because editorial bandwidth is finite. Large websites routinely maintain between 10,000 and 50,000 published pages, yet an editorial team can realistically revise only 20 to 50 URLs during a weekly content sprint. Consequently, URL prioritization determines operational efficiency. Allocating writers to stable pages wastes labor, while high-value decaying assets continue to bleed traffic undetected.
-
-In industrial content intelligence environments such as FlyRank's multi-tenant search operations, this operational challenge is acute across client portfolios spanning diverse digital verticals. Content strategists face a recurring weekly triage bottleneck: onboarding a newly contracted client domain requires instantly identifying which decaying assets warrant editorial intervention without weeks of site-specific trial and error. Because writers can update only a small fraction of a client library each sprint, triage precision directly dictates organic traffic preservation and client ROI.
+Managing content decay poses a severe operational bottleneck because editorial bandwidth is finite. In multi-tenant enterprise search operations such as FlyRank (managing 10,000--50,000 pages per client across diverse digital verticals), writers can realistically revise only 20 to 50 URLs per weekly sprint. Onboarding a newly contracted client domain requires immediately prioritizing decaying assets without months of site-specific trial and error. Allocating writers to stable pages wastes labor, while high-value decaying assets bleed traffic undetected, making triage precision directly dictate organic traffic preservation and client ROI.
 
 Historically, organizations have relied on deterministic heuristic rules, such as flagging articles older than 90 days or pages ranking on search engine results page (SERP) Page 2. However, these heuristics suffer from three structural shortcomings:
-\begin{enumerate}
-    \item \textbf{Authority Disconnect:} High-authority domains often preserve rankings for months without updates, whereas smaller domains decay rapidly. Uniform age thresholds ignore domain authority differences.
-    \item \textbf{Arbitrary Cutoffs:} Rigid thresholds treat position 20 as an urgent failure while ignoring position 21, overlooking longitudinal momentum and reader engagement.
-    \item \textbf{Demand Disconnect:} Simple rules often flag stale pages ranking deep in search results despite negligible query impressions, expending editorial effort on zero-demand assets.
-\end{enumerate}
+(1)~\\textbf{Authority Disconnect:} High-authority domains often preserve rankings for months without updates, whereas smaller domains decay rapidly, causing uniform age thresholds to fail;
+(2)~\\textbf{Arbitrary Cutoffs:} Rigid thresholds treat position 20 as an urgent failure while ignoring position 21, overlooking longitudinal momentum and reader engagement; and
+(3)~\\textbf{Demand Disconnect:} Simple rules often flag stale pages ranking deep in search results despite negligible query impressions, expending editorial effort on zero-demand assets.
 
 To resolve these limitations, this study evaluates whether supervised machine learning can learn decay dynamics from observable search telemetry and rank URLs by potential business impact. Specifically, this research addresses the following formal question:
-\begin{quote}
-\textit{Can a supervised machine learning model, trained on observable search signals without data leakage, outperform deterministic heuristic baseline rules in ranking candidate URLs for editorial refresh on completely unseen client domains?}
-\end{quote}
+\\begin{quote}
+\\textit{Can a supervised machine learning model, trained on observable search signals without data leakage, outperform deterministic heuristic baseline rules in ranking candidate URLs for editorial refresh on completely unseen client domains?}
+\\end{quote}
 
 This paper provides four primary contributions:
-\begin{itemize}
-    \item Construction of an anonymized benchmark dataset containing 30,000 mature URLs across 32 client accounts from an industrial 78.8-million-row warehouse release.
-    \item Demonstration that naive random splits yield an artificial 1.000 top-50 precision due to domain memorization, establishing that client-grouped validation is mandatory.
-    \item Empirical evidence that supervised models more than double baseline triage precision on unseen domains (0.420--0.780 vs. 0.300, 0.680 for Random Forest), reaching 0.980 when combined with search demand in a composite Action Score.
-    \item Design of an interpretable editorial playbook with five action archetypes, diagnostic reason codes, and human-in-the-loop governance guardrails.
-\end{itemize}
+(1)~Construction of an anonymized benchmark dataset containing 30,000 mature URLs across 32 client accounts from an industrial 78.8-million-row warehouse release;
+(2)~Demonstration that naive random splits yield an artificial 1.000 top-50 precision due to domain memorization, establishing client-grouped validation as mandatory;
+(3)~Empirical evidence that supervised models more than double baseline triage precision on unseen domains (0.420--0.780 vs. 0.300, 0.680 for Random Forest), reaching 0.980 when combined with search demand in a composite Action Score; and
+(4)~Design of an interpretable editorial playbook with five action archetypes, diagnostic reason codes, and human-in-the-loop governance guardrails.
 
-\section{Related Work}
-\subsection{Search Dynamics and Position Bias}
-This research builds upon established findings in web search and user behavior. Radlinski and Craswell \cite{radlinski2010comparing} and Joachims et al. \cite{joachims2017accurately} demonstrated that user attention drops precipitously outside the top search positions. Craswell et al. \cite{craswell2008experimental} formalized this drop via click cascade models, showing that users inspect search results sequentially and rarely proceed past the initial entries. Agichtein et al. \cite{agichtein2006improving} established that click-through rates and browsing interactions provide strong implicit feedback regarding content relevance. Furthermore, longitudinal search analysis by FlyRank \cite{flyrank2026whitepaper} revealed that monitoring aggregate impression trajectories enables detection of content decay weeks prior to site-wide traffic drops.
+\\section{Related Work}
+\\subsection{Search Dynamics and Position Bias}
+This research builds upon established findings in web search and user behavior. Radlinski and Craswell \\cite{radlinski2010comparing} and Joachims et al. \\cite{joachims2017accurately} demonstrated that user attention drops precipitously outside the top search positions. Craswell et al. \\cite{craswell2008experimental} formalized this drop via click cascade models, showing that users inspect search results sequentially and rarely proceed past the initial entries. Agichtein et al. \\cite{agichtein2006improving} established that click-through rates and browsing interactions provide strong implicit feedback regarding content relevance. Furthermore, longitudinal search analysis by FlyRank \\cite{flyrank2026whitepaper} revealed that monitoring aggregate impression trajectories enables detection of content decay weeks prior to site-wide traffic drops.
 
-\subsection{Machine Learning for Tabular Ranking}
-Learning-to-rank algorithms provide standard methodologies for converting multi-dimensional search features into prioritized queues \cite{liu2009learning, chapelle2011yahoo}. For tabular data exhibiting skewed distributions, tree-based ensembles including Random Forests \cite{breiman2001random} and Gradient Boosted Trees \cite{chen2016xgboost} have demonstrated strong empirical performance \cite{pedregosa2011scikit}. Tree ensembles effectively capture non-linear interactions, such as high query volume coupled with declining reader dwell time, without requiring restrictive parametric assumptions.
+\\subsection{Machine Learning for Tabular Ranking}
+Learning-to-rank algorithms provide standard methodologies for converting multi-dimensional search features into prioritized queues \\cite{liu2009learning, chapelle2011yahoo}. For tabular data exhibiting skewed distributions, tree-based ensembles including Random Forests \\cite{breiman2001random} and Gradient Boosted Trees \\cite{chen2016xgboost} have demonstrated strong empirical performance \\cite{pedregosa2011scikit}. Tree ensembles effectively capture non-linear interactions, such as high query volume coupled with declining reader dwell time, without requiring restrictive parametric assumptions.
 
-\subsection{Data Leakage and Validation Integrity}
-Deploying machine learning across multi-tenant domains requires strict defenses against data leakage. Kaufman et al. \cite{kaufman2012leakage} established that offline models frequently report inflated accuracy because input features inadvertently encode the target label. Sculley et al. \cite{sculley2015hidden} highlighted that undeclared feedback loops create critical technical debt in machine learning systems. In multi-client search environments, evaluating models via naive random splits causes algorithms to memorize client-specific volume baselines rather than learning generalizable decay patterns \cite{kohavi1995study, provost1998case}. Client-grouped partitioning is therefore required for realistic out-of-domain evaluation. Finally, official search guidelines emphasize that content must remain reliable and up-to-date \cite{google2024helpful}, while balanced natural class distributions avoid artificial oversampling artifacts \cite{chawla2002smote}.
+\\subsection{Data Leakage and Validation Integrity}
+Deploying machine learning across multi-tenant domains requires strict defenses against data leakage. Kaufman et al. \\cite{kaufman2012leakage} established that offline models frequently report inflated accuracy because input features inadvertently encode the target label. Sculley et al. \\cite{sculley2015hidden} highlighted that undeclared feedback loops create critical technical debt in machine learning systems. In multi-client search environments, evaluating models via naive random splits causes algorithms to memorize client-specific volume baselines rather than learning generalizable decay patterns \\cite{kohavi1995study, provost1998case}. Client-grouped partitioning is therefore required for realistic out-of-domain evaluation. Finally, official search guidelines emphasize that content must remain reliable and up-to-date \\cite{google2024helpful}, while balanced natural class distributions avoid artificial oversampling artifacts \\cite{chawla2002smote}.
 
-\section{Data}
-\subsection{Warehouse Source and Scale}
-Experiments utilize the FlyRank AI/ML Internship Warehouse Release (\texttt{v20260703}), hosted publicly on Hugging Face at \texttt{FlyRank/internship-warehouse}. The complete repository comprises 78,835,655 daily performance records, 519,606 unique content entries, and 2,414,248 search query observations across 104 client accounts over a 17-month window from January 27, 2025 to June 30, 2026.
+\\section{Data}
+\\subsection{Warehouse Source and Scale}
+Experiments utilize the FlyRank AI/ML Internship Warehouse Release (\\texttt{v20260703}), hosted publicly on Hugging Face at \\texttt{FlyRank/internship-warehouse}. The complete repository comprises 78,835,655 daily performance records, 519,606 unique content entries, and 2,414,248 search query observations across 104 client accounts over a 17-month window from January 27, 2025 to June 30, 2026.
 
-\subsection{Mature Content Selection and Client Filtering}
+\\subsection{Mature Content Selection and Client Filtering}
 Search engines frequently test newly published URLs through exploratory ranking placements, producing temporary volatility that does not reflect intrinsic content stability. To isolate mature lifecycle dynamics, the study population is restricted to URLs with at least 90 days of age and non-zero search impressions:
-\begin{equation}
-\mathcal{S}_{\text{mature}} = \{ i \mid \text{imp}_{90\text{d}}(i) > 0 \;\land\; \text{age}(i) \ge 90 \}
-\end{equation}
-To ensure robust longitudinal telemetry, client accounts were included in the analytical release only if they maintained: (1) continuous 90-day tracking without telemetry gaps; (2) at least 100 indexed URLs; and (3) verified Google Search Console telemetry. This filtering produced a standardized study cohort of \textbf{30,000 unique URLs across 32 client accounts}.
+\\begin{equation}
+\\mathcal{S}_{\\text{mature}} = \\{ i \\mid \\text{imp}_{90\\text{d}}(i) > 0 \\;\\land\\; \\text{age}(i) \\ge 90 \\}
+\\end{equation}
+To ensure robust longitudinal telemetry, client accounts were included in the analytical release only if they maintained: (1) continuous 90-day tracking without telemetry gaps; (2) at least 100 indexed URLs; and (3) verified Google Search Console telemetry. This filtering produced a standardized study cohort of \\textbf{30,000 unique URLs across 32 client accounts}.
 
-\subsection{Target Label Definition and Observation Window}
-The triage task is framed as identifying historical traffic decay. Traffic momentum is calculated by comparing impressions during the most recent 30-day window ($\text{imp}_{t-30:t}$) to the preceding 30-day window ($\text{imp}_{t-60:t-30}$):
-\begin{equation}
-\text{trend\_pct}_i = \frac{\text{imp}_{t-30:t}(i) - \text{imp}_{t-60:t-30}(i)}{\text{imp}_{t-60:t-30}(i)}
-\end{equation}
-An article is labeled as declining ($y_i = 1$) if its impression momentum drops below negative five percent ($\text{trend\_pct} < -0.05$):
-\begin{equation}
-y_i = \mathbb{I}(\text{trend\_direction}_i = \text{``down''})
-\end{equation}
-Across the 30,000 mature URLs, 16,262 items exhibit negative momentum, yielding a natural base rate of \textbf{54.21\%}.
+\\subsection{Target Label Definition and Observation Window}
+The triage task is framed as identifying historical traffic decay. Traffic momentum is calculated by comparing impressions during the most recent 30-day window ($\\text{imp}_{t-30:t}$) to the preceding 30-day window ($\\text{imp}_{t-60:t-30}$):
+\\begin{equation}
+\\text{trend\\_pct}_i = \\frac{\\text{imp}_{t-30:t}(i) - \\text{imp}_{t-60:t-30}(i)}{\\text{imp}_{t-60:t-30}(i)}
+\\end{equation}
+An article is labeled as declining ( = 1$) if its impression momentum drops below negative five percent ($\\text{trend\\_pct} < -0.05$):
+\\begin{equation}
+y_i = \\mathbb{I}(\\text{trend\\_direction}_i = \\text{`down''})
+\\end{equation}
+Across the 30,000 mature URLs, 16,262 items exhibit negative momentum, yielding a natural base rate of \\textbf{54.21\\%}.
 
-\textit{Methodological Framing:} This label captures observed historical decline within the 90-day observation window, rather than a forward-looking future forecast. The system therefore performs retrospective decline triage and candidate prioritization for human review, rather than automated future traffic forecasting.
+\\textit{Methodological Framing:} This label captures observed historical decline within the 90-day observation window, rather than a forward-looking future forecast. The system therefore performs retrospective decline triage and candidate prioritization for human review, rather than automated future traffic forecasting.
 
-\subsection{Data Privacy and Public Safety}
+\\subsection{Data Privacy and Public Safety}
 To protect client confidentiality, all domain identifiers, URLs, and query strings were mapped to synthetic anonymized tokens. All reported metrics utilize public-safe aggregate statistics.
 
-\section{Methodology}
-\subsection{Feature Engineering ($X$)}
-To model decay patterns without data leakage, 27 observable signals available at review time ($t = 0$) were extracted, following standard feature selection principles \cite{guyon2003introduction}. Crucially, the 30-day sub-windows ($\text{imp}_{t-30:t}$, $\text{imp}_{t-60:t-30}$) and percentage trend column ($\text{trend\_pct}$) were strictly excluded from the feature matrix because they were used directly to construct the label.
+\\section{Methodology}
+\\subsection{Feature Engineering ($)}
+To model decay patterns without data leakage, 27 observable signals available at review time ( = 0$) were extracted, following standard feature selection principles \\cite{guyon2003introduction}. Crucially, the 30-day sub-windows ($\\text{imp}_{t-30:t}$, $\\text{imp}_{t-60:t-30}$) and percentage trend column ($\\text{trend\\_pct}$) were strictly excluded from the feature matrix because they were used directly to construct the label.
 
-Table~\ref{tab:features} details the feature taxonomy, organized into four operational categories.
+Table~\\ref{tab:features} details the feature taxonomy, organized into four operational categories.
 
-\begin{table}[htbp]
-\caption{Feature Taxonomy and Extraction Windows ($M = 27$)}
-\label{tab:features}
-\centering
-\setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{lp{3.4cm}c}
-\toprule
-\textbf{Category} & \textbf{Observable Signals} & \textbf{Window} \\
-\midrule
-Traffic Volume & $\log(1+\text{imp}_{90\text{d}})$, $\log(1+\text{clicks}_{90\text{d}})$, & 90-day \\
-\& Momentum & $\log(1+\text{sessions}_{90\text{d}})$, $\log(1+\text{ai\_sess}_{90\text{d}})$, & history \\
+\\begin{table}[htbp]
+\\caption{Feature Taxonomy and Extraction Windows ( = 27$)}
+\\label{tab:features}
+\\centering
+\\setlength{\\tabcolsep}{2.5pt}
+\\resizebox{0.96\\columnwidth}{!}{%
+\\begin{tabular}{lp{3.2cm}c}
+\\toprule
+\\textbf{Category} & \\textbf{Observable Signals} & \\textbf{Window} \\
+\\midrule
+Traffic Volume & $\\log(1+\\text{imp}_{90\\text{d}})$, $\\log(1+\\text{clicks}_{90\\text{d}})$, & 90-day \\
+\\& Momentum & $\\log(1+\\text{sessions}_{90\\text{d}})$, $\\log(1+\\text{ai\\_sess}_{90\\text{d}})$, & history \\
 & days with impressions, days with sessions & \\
-\midrule
+\\midrule
 Search Visibility & Average rank position, CTR, discrete & 90-day \\
-\& SERP & position brackets (Top 3, 4--10, & SERP \\
+\\& SERP & position brackets (Top 3, 4--10, & SERP \\
 & 11--20, Deep SERP), impression tier & telemetry \\
-\midrule
+\\midrule
 Content Lifecycle & Content age in days, days since update, & Review \\
-\& Freshness & age tier, freshness tier, freshness ratio & date ($t=0$) \\
-\midrule
+\\& Freshness & age tier, freshness tier, freshness ratio & date (=0$) \\
+\\midrule
 Engagement & Word count, character count, scroll & Review \\
-\& Quality & rate, engagement rate, AI traffic share, & date ($t=0$) \\
+\\& Quality & rate, engagement rate, AI traffic share, & date (=0$) \\
 & competition level, content type, intent, CPC & \\
-\bottomrule
-\end{tabular}
-\end{table}
+\\bottomrule
+\\end{tabular}%
+}
+\\end{table}
 
-Logarithmic transformation, $\log(1 + x)$, was applied to volume counters to compress heavy-tailed power-law distributions. This prevents high-traffic outliers from distorting loss gradients while enabling equitable comparison across small and large pages.
+Logarithmic transformation, $\\log(1 + x)$, was applied to volume counters to compress heavy-tailed power-law distributions. This prevents high-traffic outliers from distorting loss gradients while enabling equitable comparison across small and large pages.
 
-\subsection{Composite Action Score Formulation}
-Predicted decay probability alone is insufficient for setting sprint priorities. A page with a 95\% probability of decline that generates only five monthly impressions does not justify manual revision. To align recommendations with business value, predicted decline probabilities are combined with search demand and ranking leverage into an operational \textit{Action Score}:
-\begin{equation}
-\text{Action\_Score}_i = \log(1 + \text{imp}_i) \cdot \hat{p}_i \cdot w(\text{pos}_i)
-\end{equation}
-where $\text{imp}_i$ is the 90-day impression volume, $\hat{p}_i = P(y=1 \mid X_i)$ is the model's predicted decline probability, and $w(\text{pos}_i)$ is a discrete position weight reflecting SERP click sensitivity \cite{radlinski2010comparing, craswell2008experimental}:
-\begin{equation}
-w(p) = \begin{cases}
-1.0, & 0 < p \le 10 \text{ (Page 1)} \\
-0.8, & 10 < p \le 20 \text{ (Page 2)} \\
-0.5, & p > 20 \text{ (Deep SERP)} \\
-0.2, & p \le 0 \text{ (Unranked)}
-\end{cases}
-\end{equation}
+\\subsection{Composite Action Score Formulation}
+Predicted decay probability alone is insufficient for setting sprint priorities. A page with a 95\\% probability of decline that generates only five monthly impressions does not justify manual revision. To align recommendations with business value, predicted decline probabilities are combined with search demand and ranking leverage into an operational \\textit{Action Score}:
+\\begin{equation}
+\\text{Action\\_Score}_i = \\log(1 + \\text{imp}_i) \\cdot \\hat{p}_i \\cdot w(\\text{pos}_i)
+\\end{equation}
+where $\\text{imp}_i$ is the 90-day impression volume, $\\hat{p}_i = P(y=1 \\mid X_i)$ is the model's predicted decline probability, and (\\text{pos}_i)$ is a discrete position weight reflecting SERP click sensitivity \\cite{radlinski2010comparing, craswell2008experimental}:
+\\begin{equation}
+w(p) = \\begin{cases}
+1.0, & 0 < p \\le 10 \\text{ (Page 1)} \\
+0.8, & 10 < p \\le 20 \\text{ (Page 2)} \\
+0.5, & p > 20 \\text{ (Deep SERP)} \\
+0.2, & p \\le 0 \\text{ (Unranked)}
+\\end{cases}
+\\end{equation}
 Position weights reflect heuristic domain multipliers prioritizing assets where modest ranking drops produce severe click losses. Scores are linearly scaled to a 0--100 index for planning.
 
-\subsection{Leakage Prevention and Auditing}
-Four systematic verification checks were conducted following Kaufman et al. \cite{kaufman2012leakage}:
-\begin{enumerate}
-    \item \textbf{Exclusion of Target Derivatives:} All fields derived directly from the outcome, including $\text{trend\_pct}$, were excluded.
-    \item \textbf{Exclusion of Downstream Flags:} Production scores and post-outcome metrics were removed to prevent circular feedback.
-    \item \textbf{Intentional Leakage Sanity Check:} Injecting the raw trend column into the training matrix produced an artificial validation score of 1.0000, confirming that the pipeline detects leakage immediately. Removing the column returned scores to an honest 0.610.
-    \item \textbf{Correlation Tower Audit:} Pearson correlation against the target showed a maximum value of $r = 0.1901$ (active impression days), proving that no individual feature exposes the label.
-\end{enumerate}
+\\subsection{Leakage Prevention and Auditing}
+Four systematic verification checks were conducted following Kaufman et al. \\cite{kaufman2012leakage}:
+(1)~\\textbf{Exclusion of Target Derivatives:} All fields derived directly from the outcome, including $\\text{trend\\_pct}$, were excluded;
+(2)~\\textbf{Exclusion of Downstream Flags:} Production scores and post-outcome metrics were removed to prevent circular feedback;
+(3)~\\textbf{Intentional Leakage Sanity Check:} Injecting the raw trend column into the training matrix produced an artificial validation score of 1.0000, confirming that the pipeline detects leakage immediately, while removing it returned scores to an honest 0.610; and
+(4)~\\textbf{Correlation Tower Audit:} Pearson correlation against the target showed a maximum value of  = 0.1901$ (active impression days), proving that no individual feature exposes the label.
 
-\section{Experimental Setup and Validation}
-\subsection{Client-Grouped Holdout Design}
-To evaluate generalization to unseen client domains, the dataset was partitioned using \texttt{GroupShuffleSplit} grouped strictly on $\text{client\_id}$ with an 80/20 train/test split:
-\begin{itemize}
-    \item \textbf{Training Partition:} 23,837 pages from 25 client accounts (55.0\% decline rate).
-    \item \textbf{Testing Partition:} 6,163 pages from 7 held-out client accounts (51.1\% decline rate).
-    \item \textbf{Domain Isolation:} $\text{Clients}_{\text{train}} \cap \text{Clients}_{\text{test}} = \emptyset$ (zero client overlap).
-\end{itemize}
-Because each client account represents a distinct domain property, zero client overlap ensures that algorithms cannot memorize site-specific traffic levels.
+\\section{Experimental Setup and Validation}
+\\subsection{Client-Grouped Holdout Design}
+To evaluate generalization to unseen client domains, the dataset was partitioned using \\texttt{GroupShuffleSplit} grouped strictly on $\\text{client\\_id}$ with an 80/20 train/test split: 23,837 pages across 25 training clients (55.0\\% decline rate) and 6,163 pages across 7 held-out test clients (51.1\\% decline rate). Zero client overlap ($\\text{Clients}_{\\text{train}} \\cap \\text{Clients}_{\\text{test}} = \\emptyset$) ensures that algorithms cannot memorize site-specific traffic levels.
 
-\subsection{Candidate Models and Benchmark Baseline}
+\\subsection{Candidate Models and Benchmark Baseline}
 Four modeling approaches were evaluated on this split:
-\begin{enumerate}
-    \item \textbf{Baseline Rules (Week 4):} A heuristic formula multiplying log-impressions by discrete position and freshness tiers.
-    \item \textbf{Logistic Regression:} A standardized linear classifier ($L_2$ regularization, $C=1.0$) evaluating monotonic linear relationships.
-    \item \textbf{Decision Tree:} A depth-constrained tree ($\text{max\_depth}=5$) modeling discrete step-function thresholds.
-    \item \textbf{Random Forest:} An ensemble of 100 decision trees ($\text{max\_depth}=12$, $\text{random\_state}=42$) capturing non-linear feature interactions.
-\end{enumerate}
+(1)~\\textbf{Baseline Rules (Week 4):} A heuristic formula multiplying log-impressions by discrete position and freshness tiers;
+(2)~\\textbf{Logistic Regression:} A standardized linear classifier ($ regularization, =1.0$) evaluating monotonic linear relationships;
+(3)~\\textbf{Decision Tree:} A depth-constrained tree ($\\text{max\\_depth}=5$) modeling discrete step-function thresholds; and
+(4)~\\textbf{Random Forest:} An ensemble of 100 decision trees ($\\text{max\\_depth}=12$, $\\text{random\\_state}=42$) capturing non-linear feature interactions.
 
-\subsection{Evaluation Metrics}
-Because editorial teams realistically review 50 pages per week, the primary evaluation metric is \textbf{Precision@50}:
-\begin{equation}
-\text{Precision@}K = \frac{1}{K} \sum_{i=1}^{K} y_{(i)}
-\end{equation}
-where $y_{(i)}$ is the true label of the candidate ranked at index $i$. Across the entire test set, Average Precision (PR-AUC), ROC-AUC \cite{fawcett2006introduction}, Recall, and F1-score are also evaluated.
+\\subsection{Evaluation Metrics}
+Because editorial teams realistically review 50 pages per week, the primary evaluation metric is \\textbf{Precision@50}:
+\\begin{equation}
+\\text{Precision@}K = \\frac{1}{K} \\sum_{i=1}^{K} y_{(i)}
+\\end{equation}
+where {(i)}$ is the true label of the candidate ranked at index $. Across the entire test set, Average Precision (PR-AUC), ROC-AUC \\cite{fawcett2006introduction}, Recall, and F1-score are also evaluated.
 
-\section{Results}
-\subsection{Model vs. Baseline Performance}
-Table~\ref{tab:model_comparison} summarizes model performance on the held-out test split of 6,163 pages across 7 unseen client websites.
+\\section{Results}
+\\subsection{Model vs. Baseline Performance}
+Table~\\ref{tab:model_comparison} summarizes model performance on the held-out test split of 6,163 pages across 7 unseen client websites.
 
-\begin{table}[htbp]
-\caption{Model Performance on Unseen Client Websites ($N = 6,163$, Holdout Base Rate = 0.511)}
-\label{tab:model_comparison}
-\centering
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Model} & \textbf{P@50} & \textbf{PR-AUC} & \textbf{ROC-AUC} & \textbf{Recall} & \textbf{F1} \\
-\midrule
+\\begin{table}[htbp]
+\\caption{Model Performance on Unseen Client Websites ( = 6,163$, Holdout Base Rate = 0.511)}
+\\label{tab:model_comparison}
+\\centering
+\\setlength{\\tabcolsep}{2.5pt}
+\\resizebox{0.96\\columnwidth}{!}{%
+\\begin{tabular}{lccccc}
+\\toprule
+\\textbf{Model} & \\textbf{P@50} & \\textbf{PR-AUC} & \\textbf{ROC-AUC} & \\textbf{Recall} & \\textbf{F1} \\
+\\midrule
 Baseline Rules (Week 4) & 0.300 & 0.522 & 0.538 & -- & -- \\
-Logistic Regression & \textbf{0.780} & \textbf{0.615} & \textbf{0.625} & \textbf{0.669} & \textbf{0.624} \\
-Decision Tree (max\_depth=5) & 0.420 & 0.570 & 0.592 & 0.574 & 0.584 \\
-Random Forest (100 trees) & 0.680$^*$ & 0.602 & 0.612 & 0.668 & 0.618 \\
-\bottomrule
-\end{tabular}
-\vspace{0.2em}
-\flushleft
-\footnotesize{$^*$When Random Forest probabilities are combined with search demand and position leverage in the composite Action Score, Precision@50 reaches \textbf{0.980} (49 out of 50 pages verified declining).}
-\end{table}
+Logistic Regression & \\textbf{0.780} & \\textbf{0.615} & \\textbf{0.625} & \\textbf{0.669} & \\textbf{0.624} \\
+Decision Tree (depth=5) & 0.420 & 0.570 & 0.592 & 0.574 & 0.584 \\
+Random Forest (100 trees) & 0.680*$ & 0.602 & 0.612 & 0.668 & 0.618 \\
+\\bottomrule
+\\end{tabular}%
+}
+\\par\\vspace{2pt}
+\\parbox{0.96\\columnwidth}{\\scriptsize * Random Forest probabilities are combined with search demand and position leverage in the composite Action Score, Precision@50 reaches \\textbf{0.980} (49 out of 50 pages verified declining).}
+\\end{table}
 
-Both supervised models decisively outperform the heuristic baseline. In top-50 precision, standalone Logistic Regression reaches 0.780 and standalone Random Forest reaches 0.680, compared to 0.300 for the baseline rules, representing a \textbf{+127\% to +160\% relative improvement}. Furthermore, combining Random Forest probabilities with search volume and position weighting in the composite Action Score yields a top-50 precision of \textbf{0.980}, successfully identifying 49 truly declining pages out of 50 recommendations.
+Both supervised models decisively outperform the heuristic baseline. In top-50 precision, standalone Logistic Regression reaches 0.780 and standalone Random Forest reaches 0.680, compared to 0.300 for the baseline rules, representing a \\textbf{+127\\% to +160\\% relative improvement}. Furthermore, combining Random Forest probabilities with search volume and position weighting in the composite Action Score yields a top-50 precision of \\textbf{0.980}, successfully identifying 49 truly declining pages out of 50 recommendations.
 
 Comparing models reveals operational trade-offs. Logistic Regression provides well-calibrated linear ranking, yielding the highest standalone precision among top candidates (0.780) and balanced full-test performance (PR-AUC = 0.615, ROC-AUC = 0.625, F1 = 0.624). In contrast, Random Forest captures non-linear interactions across impressions and ranking drops, achieving 0.680 standalone top-50 precision and 0.668 recall across all 6,163 test pages. Thus, teams executing focused weekly sprints benefit most from high-precision ranking, while teams conducting broad quarterly audits can utilize Random Forest to discover a wider set of declining assets.
 
-\subsection{The Validation Split Gap}
-Table~\ref{tab:split_gap} illustrates the consequences of improper validation design.
+\\subsection{The Validation Split Gap}
+Table~\\ref{tab:split_gap} illustrates the consequences of improper validation design.
 
-\begin{table}[htbp]
-\caption{Comparison of Naive Random Split vs. Honest Client-Grouped Split}
-\label{tab:split_gap}
-\centering
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lcccc}
-\toprule
-\textbf{Split Design} & \textbf{Client Overlap} & \textbf{Base Rate} & \textbf{P@50} & \textbf{ROC-AUC} \\
-\midrule
-Naive Random Split & 31 clients (100\%) & 0.545 & 1.000 & 0.775 \\
-Honest Grouped Split & 0 clients (0\%) & 0.511 & 0.680 & 0.612 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\\begin{table}[htbp]
+\\caption{Comparison of Naive Random Split vs. Honest Client-Grouped Split}
+\\label{tab:split_gap}
+\\centering
+\\setlength{\\tabcolsep}{2.5pt}
+\\resizebox{0.96\\columnwidth}{!}{%
+\\begin{tabular}{lcccc}
+\\toprule
+\\textbf{Split Design} & \\textbf{Client Overlap} & \\textbf{Base Rate} & \\textbf{P@50} & \\textbf{ROC-AUC} \\
+\\midrule
+Naive Random Split & 31 clients (100\\%) & 0.545 & 1.000 & 0.775 \\
+Honest Grouped Split & 0 clients (0\\%) & 0.511 & 0.680 & 0.612 \\
+\\bottomrule
+\\end{tabular}%
+}
+\\end{table}
 
 Evaluating Random Forest via standard random splitting produced an artificial Precision@50 of 1.000 and ROC-AUC of 0.775 due to client memorization. When evaluated on unseen client accounts, Precision@50 settled at an honest 0.680. This substantial gap confirms that grouped validation is mandatory for assessing out-of-domain transfer.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\columnwidth]{figures/cost_value_matrix.png}
-\caption{Cost/Value Matrix mapping logarithmic search demand against predicted decay probability. The upper-right quadrant isolates high-priority refresh candidates.}
-\label{fig:cost_value}
-\end{figure}
+\\begin{figure}[htbp]
+\\centering
+\\includegraphics[width=0.65\\columnwidth]{figures/cost_value_matrix.png}
+\\caption{Cost/Value Matrix mapping logarithmic search demand against predicted decay probability. The upper-right quadrant isolates high-priority refresh candidates.}
+\\label{fig:cost_value}
+\\end{figure}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.48\columnwidth]{figures/action_mix.png}\hfill
-\includegraphics[width=0.48\columnwidth]{figures/confidence_mix.png}
-\caption{Portfolio distribution across five suggested editorial intervention archetypes (left) and triage confidence tiers (right).}
-\label{fig:portfolio_mix}
-\end{figure}
+\\begin{figure}[htbp]
+\\centering
+\\includegraphics[width=0.48\\columnwidth]{figures/action_mix.png}\\hfill
+\\includegraphics[width=0.48\\columnwidth]{figures/confidence_mix.png}
+\\caption{Portfolio distribution across five suggested editorial intervention archetypes (left) and triage confidence tiers (right).}
+\\label{fig:portfolio_mix}
+\\end{figure}
 
-\subsection{Feature Importance Analysis}
-Random Forest Gini feature importances reveal the primary signals utilized during tree splitting:
-\begin{enumerate}
-    \item Active impression days (\textbf{13.1\%}): consistency of search presence over time.
-    \item Logarithmic impressions (\textbf{10.7\%}): baseline traffic magnitude separating real decay from statistical noise.
-    \item Average position (\textbf{10.1\%}): physical position cliff on search engines (Page 1 vs. deep SERP).
-    \item Content age in days (\textbf{9.4\%}): content lifecycle maturity and freshness erosion.
-    \item Word count (\textbf{6.1\%}): article length and depth of coverage.
-\end{enumerate}
-Gini importance indicates feature reliance within tree splits, rather than direct physical causation in search ranking algorithms.
+\\subsection{Feature Importance Analysis}
+Random Forest Gini feature importances reveal the primary signals utilized during tree splitting: active impression days (\\textbf{13.1\\%}), logarithmic impressions (\\textbf{10.7\\%}), average position (\\textbf{10.1\\%}), content age in days (\\textbf{9.4\\%}), and word count (\\textbf{6.1\\%}). These weights reflect feature reliance within tree splits rather than direct physical causation in search ranking algorithms.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\columnwidth]{figures/top_reason_codes.png}
-\caption{Frequencies of explainable diagnostic reason codes in the final editorial triage queue.}
-\label{fig:reason_codes}
-\end{figure}
+\\begin{figure}[htbp]
+\\centering
+\\includegraphics[width=0.65\\columnwidth]{figures/top_reason_codes.png}
+\\caption{Frequencies of explainable diagnostic reason codes in the final editorial triage queue.}
+\\label{fig:reason_codes}
+\\end{figure}
 
-\section{Discussion}
+\\section{Discussion}
 Experimental findings indicate that organic search decay does not follow arbitrary calendar schedules. Deterministic rules assume articles become obsolete after 90 days. In reality, decay is a continuous process accelerating when URLs slip to positions 11--20 while retaining active query demand. Machine learning models succeed because they learn smooth non-linear boundaries, avoiding false alarms common to rigid cutoff thresholds.
 
-Furthermore, empirical results qualify the assumption that content age is the primary driver of traffic loss. Content age accounts for only 9.4\% of predictive importance, whereas ranking position and impression consistency account for nearly 34\%. Articles decline not merely because of age, but when competitor coverage improves or search intent shifts. Detecting ranking erosion early enables teams to intervene before search visibility collapses.
+Furthermore, empirical results qualify the assumption that content age is the primary driver of traffic loss. Content age accounts for only 9.4\\% of predictive importance, whereas ranking position and impression consistency account for nearly 34\\%. Articles decline not merely because of age, but when competitor coverage improves or search intent shifts. Detecting ranking erosion early enables teams to intervene before search visibility collapses.
 
 Error analysis on unseen domains reveals two notable edge cases:
-\begin{itemize}
-    \item \textbf{False Positives:} URLs ranking near position 35 that have remained dormant for months. Tree models identify low rank and high age and predict active decay, whereas traffic had flatlined long ago.
-    \item \textbf{False Negatives:} Top-ranking articles receiving minimal weekly impressions. Losing one impression represents a large percentage drop mathematically, but has negligible business significance. Weighting decay probability by demand resolves both issues by filtering inactive pages from the priority queue.
-\end{itemize}
+(1)~\\textbf{False Positives:} URLs ranking near position 35 dormant for months, where tree models predict decay despite flatlined traffic; and
+(2)~\\textbf{False Negatives:} Top-ranking articles receiving minimal weekly impressions, where a single lost impression represents a large percentage drop mathematically but negligible business significance. Weighting decay probability by demand resolves both issues by filtering inactive pages from the priority queue.
 
-\section{Limitations and Honest Framing}
-The boundaries of this research are explicitly defined:
-\begin{itemize}
-    \item \textbf{Observational Data:} Models are trained on observational telemetry. While models reliably identify pages exhibiting traffic decline, this association does not prove that refreshing an article will automatically restore lost rankings. Historical updates in real portfolios suffer from selection bias because human editors naturally choose to update pages they believe have high commercial potential.
-    \item \textbf{No Search Engine Reverse-Engineering:} This study does not attempt to reverse-engineer proprietary ranking algorithms, but models observable search metrics across commercial portfolios.
-    \item \textbf{Mature Content Scope:} Conclusions apply strictly to mature content ($\ge 90$ days old with search impressions), and do not describe new URLs.
-    \item \textbf{Offline vs. Online Divergence:} High offline precision does not guarantee online traffic recovery, which depends on editorial revision quality.
-    \item \textbf{Platform Covariate Shift:} Search layout alterations (e.g., AI Overviews, video modules) alter CTR independently of content quality.
-    \item \textbf{Single Grouped Partition:} Evaluation relies on an 80/20 grouped split across 7 test clients. Future work should assess multi-fold cross-validation to quantify client-level variance.
-\end{itemize}
+\\section{Limitations and Honest Framing}
+The boundaries of this research are explicitly defined across six dimensions:
+(1)~\\textbf{Observational Data and Selection Bias:} Models are trained on observational telemetry. While models reliably identify declining pages, this association does not prove that refreshing will restore rankings, as historical updates suffer from editorial selection bias;
+(2)~\\textbf{No Reverse-Engineering:} This study does not attempt to reverse-engineer proprietary ranking algorithms, but models observable search metrics across commercial portfolios;
+(3)~\\textbf{Mature Content Scope:} Findings apply strictly to mature content ($\\ge 90$ days old with search impressions) rather than newly indexed URLs;
+(4)~\\textbf{Offline vs. Online Divergence:} High offline precision does not guarantee online traffic recovery, which depends on editorial revision quality;
+(5)~\\textbf{Platform Covariate Shift:} Search layout alterations (e.g., AI Overviews, video carousels) alter CTR independently of content quality; and
+(6)~\\textbf{Single Grouped Partition:} Evaluation relies on an 80/20 grouped split across 7 test clients. Future work should assess multi-fold cross-validation to quantify client-level variance.
 
-\section{Ranked Recommendations}
+\\section{Ranked Recommendations}
 Editorial actions are organized into five evidence-backed archetypes:
-\begin{enumerate}
-    \item \textbf{\texttt{refresh\_and\_review\_ctr} (24.7\% of pages):} Strong rankings (positions 1--20) with below-average CTR ($<0.5\%$). \textit{Action:} Rewrite title tags and meta descriptions to improve SERP appeal.
-    \item \textbf{\texttt{refresh} (27.7\%):} Clear decay indicators with solid underlying content. \textit{Action:} Update outdated facts, statistics, and examples.
-    \item \textbf{\texttt{refresh\_and\_review\_engagement} (7.0\%):} Steady impressions with low scroll depth ($<30\%$). \textit{Action:} Redesign introductory layouts to improve visual readability.
-    \item \textbf{\texttt{expand\_and\_refresh} ($<0.1\%$):} Visible search positions despite brief coverage ($<1,000$ words). \textit{Action:} Substantially expand content depth and topical breadth.
-    \item \textbf{\texttt{monitor} (40.6\%):} Low decay probability or negligible search demand. \textit{Action:} Retain in automated monitoring without spending writer hours.
-\end{enumerate}
+(1)~\\textbf{\\texttt{refresh\\_and\\_review\\_ctr} (24.7\\% of pages):} Strong rankings (positions 1--20) with below-average CTR ($<0.5\\%$), recommending title and meta tag rewrites;
+(2)~\\textbf{\\texttt{refresh} (27.7\\%):} Clear decay indicators with solid content, recommending factual and statistical updates;
+(3)~\\textbf{\\texttt{refresh\\_and\\_review\\_engagement} (7.0\\%):} Steady impressions with low scroll depth ($<30\\%$), recommending layout restructuring;
+(4)~\\textbf{\\texttt{expand\\_and\\_refresh} ($<0.1\\%$):} Visible search positions despite brief coverage ($<1,000$ words), recommending substantial content expansion; and
+(5)~\\textbf{\\texttt{monitor} (40.6\\%):} Low decay probability or negligible search demand, retained in automated monitoring without spending writer hours.
 
 To protect search equity, three human-in-the-loop policies are enforced: (1) no autonomous AI publishing without human review; (2) no automated deletions or 301 redirects, preserving backlink equity; and (3) mandatory subject-matter expert review for sensitive medical, legal, or financial content.
 
-\subsection{Illustrative Economic Sprint Simulation}
-To evaluate operational utility, a standard weekly 50-page editorial sprint is modeled under a transparent economic simulation. Assuming an industry-standard refresh cost of \$150 per in-depth revision (3 hours at \$50 per hour), reviewing 50 pages requires a \$7,500 budget. Assuming successfully identifying and updating a true declining page protects \$500 in annual organic traffic value (200 visits at an average \$2.50 CPC equivalent):
-\begin{itemize}
-    \item \textbf{Baseline Heuristic Queue (P@50 = 0.300):} Identifies 15 declining pages ($15 \times \$500 = \$7,500$ gross value), yielding \$0 net return (\textbf{0.0\% net ROI}, breaking even) while misallocating 35 writer slots. (Exploratory full-portfolio sorts reached 0.380--0.420 under alternate tie-breaking, but held-out test precision is strictly 0.300.)
-    \item \textbf{Action Score Prioritized Queue (P@50 = 0.980):} Identifies 49 declining pages ($49 \times \$500 = \$24,500$ gross value), yielding \$17,000 net return (\textbf{+226.7\% net ROI}).
-    \item \textbf{Incremental Operational Lift:} Produces an incremental gain of \textbf{+\$17,000 in net protected value per sprint} (+34 additional true declining pages accurately targeted) compared to the heuristic baseline.
-\end{itemize}
-These figures represent an illustrative decision-support economic model based on operational cost assumptions rather than measured post-intervention revenue recovery. Retraining is recommended following major core search updates, whenever writer agreement drops below 60\%, or every 90 days.
+\\subsection{Illustrative Economic Sprint Simulation}
+To evaluate operational utility, a standard weekly 50-page editorial sprint is modeled under a transparent economic simulation. Assuming an industry-standard refresh cost of \\ per in-depth revision (3 hours at \\ per hour), reviewing 50 pages requires a \\,500 budget. Assuming successfully identifying and updating a true declining page protects \\ in annual organic traffic value (200 visits at an average \\.50 CPC equivalent):
+(1)~\\textbf{Baseline Heuristic Queue (P@50 = 0.300):} Identifies 15 declining pages ( \\times \\ = \\,500$ gross value), yielding \\ net return (\\textbf{0.0\\% net ROI}, breaking even) while misallocating 35 writer slots;
+(2)~\\textbf{Action Score Prioritized Queue (P@50 = 0.980):} Identifies 49 declining pages ( \\times \\ = \\,500$ gross value), yielding \\,000 net return (\\textbf{+226.7\\% net ROI}); and
+(3)~\\textbf{Incremental Operational Lift:} Produces an incremental gain of \\textbf{+\\,000 in net protected value per sprint} (+34 additional true declining pages accurately targeted) compared to the heuristic baseline.
+These figures represent an illustrative decision-support economic model based on operational cost assumptions rather than measured post-intervention revenue recovery. Retraining is recommended following major core search updates, whenever writer agreement drops below 60\\%, or every 90 days.
 
-\section{Reproducibility}
+\\section{Reproducibility}
 All code, models, and figure generation scripts are publicly available. Experiments can be reproduced on Python 3.12 via four steps:
-\begin{enumerate}
-    \item Clone repository and install dependencies from \texttt{requirements.txt} (\texttt{scikit-learn}, \texttt{pandas}, \texttt{duckdb}, \texttt{numpy}, \texttt{matplotlib}).
-    \item Execute \texttt{python scripts/run\_all.py} to run cleaning, model training, and chart generation on the bundled sample dataset in under two minutes.
-    \item Open and execute the capstone notebook at \href{https://colab.research.google.com/github/fardinhossain/FlyRankAI-ML-Internship-Task/blob/main/work/notebooks/capstone.ipynb?flush_cache=true}{\texttt{work/notebooks/capstone.ipynb}} to verify the grouped split and baseline comparisons.
-    \item Inspect exported JSON receipts in \texttt{work/outputs/} to verify every reported experimental metric.
-\end{enumerate}
+(1)~Clone repository and install dependencies from \\texttt{requirements.txt};
+(2)~Execute \\texttt{python scripts/run\\_all.py} to run data processing and model evaluation;
+(3)~Open and execute the capstone notebook at \\href{https://colab.research.google.com/github/fardinhossain/FlyRankAI-ML-Internship-Task/blob/main/work/notebooks/capstone.ipynb?flush_cache=true}{\\texttt{work/notebooks/capstone.ipynb}}; and
+(4)~Inspect exported JSON receipts in \\texttt{work/outputs/} to verify every reported experimental metric.
 The complete open-source project is available at: \\
-\url{https://github.com/fardinhossain/FlyRankAI-ML-Internship-Task}.
+\\url{https://github.com/fardinhossain/FlyRankAI-ML-Internship-Task}.
 
-\section{Conclusion}
+\\section{Conclusion}
 This paper investigated supervised machine learning for prioritizing content refresh candidates on unseen client websites. Evaluating 30,000 mature URLs across 32 client accounts from an industrial search warehouse demonstrated that supervised models achieve top-50 precision between 0.420 and 0.780 (0.680 for Random Forest) under honest client-grouped validation, more than doubling the 0.300 precision of heuristic rules. Combining predicted decay probabilities with search demand and ranking leverage in a composite Action Score reached a top-50 precision of 0.980.
 
 Furthermore, empirical results confirmed that naive random validation causes severe domain memorization, establishing client-grouped splitting as essential for reliable evaluation. This decision-support system transforms content maintenance from subjective guesswork into an evidence-backed workflow. Future research will explore counterfactual evaluation methods to measure post-update recovery directly and develop multi-task architectures that jointly predict rank drops and click-through changes.
 
-\section*{Acknowledgment}
-Built on the \href{https://flyrank.ai/}{FlyRank ML Internship dataset}.
+\\section*{Acknowledgment}
+Built on the \\href{https://flyrank.ai/}{FlyRank ML Internship dataset}.
 The author thanks the FlyRank engineering and data intelligence teams for provisioning the pseudonymized production search warehouse release under educational research terms. FlyRank does not endorse the specific models or operational recommendations presented in this paper.
 
-\bibliographystyle{IEEEtran}
-\bibliography{references}
+\\bibliographystyle{IEEEtran}
+\\bibliography{references}
 
-\end{document}
+\\end{document}
