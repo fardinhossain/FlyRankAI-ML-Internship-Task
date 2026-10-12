@@ -946,15 +946,18 @@
           </ul>
         </div>
 
-        <h3>Economic Cost/Value ROI Simulation</h3>
+        <h3>Illustrative Economic Cost/Value ROI Simulation</h3>
         <p>
-          Assuming an editorial labor cost of $150 per in-depth refresh (3.0 hours @ $50/h) and a 50-URL weekly sprint ($7,500 investment):
+          Assuming an editorial labor cost of $150 per in-depth refresh (3.0 hours @ $50/h) and a 50-URL weekly sprint ($7,500 investment), with $500 estimated protected value per verified declining asset (200 clicks @ $2.50 CPC):
         </p>
         <ul>
-          <li><strong>Model-Guided Triage (98% Precision@50):</strong> Catches 49 true decaying assets $\rightarrow$ estimated $24,500 gross protected value (<strong>+226.7% Net Sprint ROI</strong>).</li>
-          <li><strong>Baseline Heuristic Triage (42% Precision@50):</strong> Catches 21 true decaying assets $\rightarrow$ estimated $10,500 gross value (+40.0% Net Sprint ROI).</li>
-          <li><strong>Net Incremental Value:</strong> <strong>+$14,000 per 50-page editorial sprint</strong>.</li>
+          <li><strong>Action Score Prioritized Queue (98% Precision@50):</strong> Targets 49 verified declining assets &rarr; estimated $24,500 gross protected value, yielding $17,000 net benefit (<strong>+226.7% Net Sprint ROI</strong>).</li>
+          <li><strong>Baseline Heuristic Queue (30% Precision@50):</strong> Targets 15 verified declining assets &rarr; estimated $7,500 gross value, yielding $0 net return (<strong>0.0% Net Sprint ROI</strong>, breaking even). <em>(Note: exploratory portfolio-wide sorts with alternative tie-breaking reached 38%&ndash;42%, but held-out test precision is strictly 30%.)</em></li>
+          <li><strong>Net Incremental Value Lift:</strong> <strong>+$17,000 in net protected value per 50-page editorial sprint</strong> (+34 additional true declining assets accurately targeted).</li>
         </ul>
+        <p style="font-size: 0.9em; color: var(--text-muted, #64748b);">
+          <em>Methodological note: These economic figures represent an illustrative decision-support simulation based on operational cost assumptions rather than measured revenue recovery. Observational models triage historical decay; validating traffic recovery requires prospective counterfactual experimentation.</em>
+        </p>
       </section>
 
       <!-- Section 8: Reproducibility & Research Artifacts -->
