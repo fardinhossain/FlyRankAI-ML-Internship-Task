@@ -1,0 +1,26 @@
+{
+  "playbook_version": "ML-10 Production Action Playbook",
+  "lane": "Lane 2 - Refresh / Content Opportunity Scoring",
+  "total_mature_pages": 30000,
+  "total_clients": 32,
+  "action_mix": {
+    "monitor": 12188,
+    "refresh": 8296,
+    "refresh_and_review_ctr": 7413,
+    "refresh_and_review_engagement": 2094,
+    "expand_and_refresh": 9
+  },
+  "confidence_mix": {
+    "low": 18104,
+    "medium": 11056,
+    "high": 840
+  },
+  "top_50_precision_on_holdout": 0.98,
+  "baseline_top_50_precision": 0.42,
+  "retrain_triggers": [
+    "Google Core Algorithm Update (>2.5 sigma volatility shift)",
+    "Editorial Acceptance Degradation (<60% over 2 sprints)",
+    "Covariate Feature Drift (>20% traffic distribution shift)",
+    "Quarterly 90-day Panel Cadence"
+  ]
+}
