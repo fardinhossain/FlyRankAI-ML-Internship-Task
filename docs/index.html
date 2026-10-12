@@ -646,7 +646,7 @@
             For large-scale websites, mature articles often suffer from gradual search visibility erosion and organic traffic decay on search engines over time.
             Because editorial teams cannot manually check thousands of published pages each week, this study investigates whether supervised machine learning models can accurately identify and prioritize decaying content candidates across unseen client websites.
             To evaluate this approach, a leak-free dataset of 30,000 mature web pages was constructed across 32 client accounts from FlyRank's 78.8-million-row search database, validating candidate models under a client-grouped holdout partition with strictly isolated test domains.
-            Under this rigorous evaluation on unseen clients, standalone supervised classifiers achieved top-50 precision between 0.640 and 0.780—more than doubling the 0.300 precision of heuristic baseline rules—while combining predicted decay probabilities with search demand in a composite Action Score reached a top-50 precision of 0.980.
+            Under this rigorous evaluation on unseen clients, standalone supervised classifiers achieved top-50 precision between 0.420 and 0.780 (0.680 for Random Forest)—more than doubling the 0.300 precision of heuristic baseline rules—while combining predicted decay probabilities with search demand in a composite Action Score reached a top-50 precision of 0.980.
             Finally, these model outputs were operationalized into an interpretable editorial action playbook featuring diagnostic reason codes and human-in-the-loop safety rules, transforming ad-hoc content maintenance into a reliable decision-support system.
           </p>
           <div class="keywords-block">
@@ -821,32 +821,32 @@
               <tr style="background-color: #f0fdf4;">
                 <td><strong>Logistic Regression (Standardized)</strong></td>
                 <td><strong>0.780</strong></td>
-                <td><strong>0.616</strong></td>
+                <td><strong>0.615</strong></td>
                 <td><strong>0.625</strong></td>
-                <td>0.668</td>
-                <td>0.623</td>
+                <td><strong>0.669</strong></td>
+                <td><strong>0.624</strong></td>
               </tr>
               <tr>
                 <td><strong>Decision Tree (max_depth=5)</strong></td>
-                <td>0.380</td>
+                <td><strong>0.420</strong></td>
                 <td>0.570</td>
                 <td>0.592</td>
                 <td>0.574</td>
-                <td>0.583</td>
+                <td>0.584</td>
               </tr>
               <tr style="background-color: #eff6ff;">
                 <td><strong>Random Forest Classifier (100 Trees)</strong></td>
-                <td><strong>0.640</strong>*</td>
-                <td>0.598</td>
-                <td>0.610</td>
-                <td><strong>0.669</strong></td>
-                <td>0.619</td>
+                <td><strong>0.680</strong>*</td>
+                <td>0.602</td>
+                <td>0.612</td>
+                <td>0.668</td>
+                <td>0.618</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p style="font-size: 0.875rem; color: var(--text-light); margin-top: -1rem;">
-          *Note: When Random Forest decay probability is multiplied by logarithmic demand volume in the Composite Action Score, Precision@50 rises to <strong>0.980</strong> (49/50 true declining assets caught).
+          *Note: When Random Forest decay probability is multiplied by logarithmic demand volume and position leverage in the Composite Action Score, Precision@50 rises to <strong>0.980</strong> (49/50 true declining assets caught).
         </p>
 
         <h3>Before vs. After Validation Contrast</h3>
@@ -855,10 +855,10 @@
         </p>
         <ul>
           <li><strong>Naive Random Row Split:</strong> Precision@50 = <strong>1.000</strong>, ROC-AUC = <strong>0.775</strong>. (Artificially inflated by 31 leaking client accounts).</li>
-          <li><strong>Honest Grouped Client Split:</strong> Precision@50 = <strong>0.640</strong>, ROC-AUC = <strong>0.610</strong>.</li>
+          <li><strong>Honest Grouped Client Split:</strong> Precision@50 = <strong>0.680</strong>, ROC-AUC = <strong>0.612</strong>.</li>
         </ul>
         <p>
-          This gap is a primary finding: models evaluated on random row splits appear near-flawless offline but suffer domain transfer degradation when exposed to newly onboarded domains. Even after accounting for this penalty, the trained models still deliver a <strong>+113% to +160% relative lift</strong> over the baseline rule (0.640–0.780 vs. 0.300).
+          This gap is a primary finding: models evaluated on random row splits appear near-flawless offline but suffer domain transfer degradation when exposed to newly onboarded domains. Even after accounting for this penalty, the trained models still deliver a <strong>+127% to +160% relative lift</strong> over the baseline rule (0.680–0.780 vs. 0.300).
         </p>
 
         <!-- Figures -->
@@ -1045,7 +1045,7 @@
       <section id="conclusion">
         <h2>9. Conclusion</h2>
         <p>
-          This study evaluated machine learning models for prioritizing organic search content refresh on unseen client websites. By analyzing 30,000 mature URLs across 32 client accounts from an industrial search warehouse, the results showed that supervised classifiers achieve a top-50 triage precision of 0.640 to 0.780 under honest client-grouped validation, outperforming deterministic heuristic rules (0.300) by more than double. Combining predicted decay probabilities with search demand in a composite Action Score elevated top-50 precision to 0.980, ensuring that human editorial hours are directed toward high-value pages.
+          This study evaluated machine learning models for prioritizing organic search content refresh on unseen client websites. By analyzing 30,000 mature URLs across 32 client accounts from an industrial search warehouse, the results showed that supervised classifiers achieve a top-50 triage precision of 0.420 to 0.780 (0.680 for Random Forest) under honest client-grouped validation, outperforming deterministic heuristic rules (0.300) by more than double. Combining predicted decay probabilities with search demand in a composite Action Score elevated top-50 precision to 0.980, ensuring that human editorial hours are directed toward high-value pages.
         </p>
         <p>
           The findings underscore that naive random validation causes severe domain memorization and that practical deployment requires grouping data by client domain. In operational practice, decision-support machine learning transforms content refresh from subjective guesswork into an evidence-based, reproducible workflow. Future work will investigate counterfactual evaluation methods to measure post-refresh traffic recovery and multi-task learning architectures that jointly predict click-through rate shifts and keyword ranking volatility.

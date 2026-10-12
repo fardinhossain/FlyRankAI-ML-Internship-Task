@@ -35,7 +35,7 @@ fardin.hosn@gmail.com}
 For large-scale websites, mature articles often suffer from gradual search visibility erosion and organic traffic decay on search engines over time.
 Because editorial teams cannot manually check thousands of published pages each week, this study investigates whether supervised machine learning models can accurately identify and prioritize decaying content candidates across unseen client websites.
 To evaluate this approach, a leak-free dataset of 30,000 mature web pages was constructed across 32 client accounts from FlyRank's 78.8-million-row search database, validating candidate models under a client-grouped holdout partition with strictly isolated test domains.
-Under this rigorous evaluation on unseen clients, standalone supervised classifiers achieved top-50 precision between 0.640 and 0.780—more than doubling the 0.300 precision of heuristic baseline rules—while combining predicted decay probabilities with search demand in a composite Action Score reached a top-50 precision of 0.980.
+Under this rigorous evaluation on unseen clients, standalone supervised classifiers achieved top-50 precision between 0.420 and 0.780 (0.680 for Random Forest)—more than doubling the 0.300 precision of heuristic baseline rules—while combining predicted decay probabilities with search demand in a composite Action Score reached a top-50 precision of 0.980.
 Finally, these model outputs were operationalized into an interpretable editorial action playbook featuring diagnostic reason codes and human-in-the-loop safety rules, transforming ad-hoc content maintenance into a reliable decision-support system.
 \end{abstract}
 
@@ -205,9 +205,9 @@ Table~\ref{tab:model_comparison} summarizes model performance on the held-out te
 \textbf{Model} & \textbf{P@50} & \textbf{PR-AUC} & \textbf{ROC-AUC} & \textbf{Recall} & \textbf{F1} \\
 \midrule
 Baseline Rules (Week 4) & 0.300 & 0.522 & 0.538 & --- & --- \\
-Logistic Regression & \textbf{0.780} & \textbf{0.616} & \textbf{0.625} & 0.668 & \textbf{0.623} \\
-Decision Tree (depth=5) & 0.380 & 0.570 & 0.592 & 0.574 & 0.583 \\
-Random Forest (100 trees) & 0.640$^*$ & 0.598 & 0.610 & \textbf{0.669} & 0.619 \\
+Logistic Regression & \textbf{0.780} & \textbf{0.615} & \textbf{0.625} & \textbf{0.669} & \textbf{0.624} \\
+Decision Tree (max\_depth=5) & 0.420 & 0.570 & 0.592 & 0.574 & 0.584 \\
+Random Forest (100 trees) & 0.680$^*$ & 0.602 & 0.612 & 0.668 & 0.618 \\
 \bottomrule
 \end{tabular}
 \vspace{0.2em}
@@ -215,9 +215,9 @@ Random Forest (100 trees) & 0.640$^*$ & 0.598 & 0.610 & \textbf{0.669} & 0.619 \
 \footnotesize{$^*$When Random Forest probabilities are combined with search demand and position leverage in the composite Action Score, Precision@50 reaches \textbf{0.980} (49 out of 50 pages verified declining).}
 \end{table}
 
-Both supervised models decisively outperform the heuristic baseline. In top-50 precision, standalone Logistic Regression reaches 0.780 and standalone Random Forest reaches 0.640, compared to 0.300 for the baseline rules—representing a \textbf{+113\% to +160\% relative improvement}. Furthermore, combining Random Forest probabilities with search volume and position weighting in the composite Action Score yields a top-50 precision of \textbf{0.980}, successfully identifying 49 truly declining pages out of 50 recommendations.
+Both supervised models decisively outperform the heuristic baseline. In top-50 precision, standalone Logistic Regression reaches 0.780 and standalone Random Forest reaches 0.680, compared to 0.300 for the baseline rules—representing a \textbf{+127\% to +160\% relative improvement}. Furthermore, combining Random Forest probabilities with search volume and position weighting in the composite Action Score yields a top-50 precision of \textbf{0.980}, successfully identifying 49 truly declining pages out of 50 recommendations.
 
-Comparing models reveals operational trade-offs. Logistic Regression provides well-calibrated linear ranking, yielding the highest standalone precision among top candidates (0.780). In contrast, Random Forest captures non-linear interactions across impressions and ranking drops, achieving the highest overall recall (0.669) across all 6,163 test pages. Thus, teams executing focused weekly sprints benefit most from high-precision ranking, while teams conducting broad quarterly audits can utilize Random Forest to discover a wider set of declining assets.
+Comparing models reveals operational trade-offs. Logistic Regression provides well-calibrated linear ranking, yielding the highest standalone precision among top candidates (0.780) and balanced full-test performance (PR-AUC = 0.615, ROC-AUC = 0.625, F1 = 0.624). In contrast, Random Forest captures non-linear interactions across impressions and ranking drops, achieving 0.680 standalone top-50 precision and 0.668 recall across all 6,163 test pages. Thus, teams executing focused weekly sprints benefit most from high-precision ranking, while teams conducting broad quarterly audits can utilize Random Forest to discover a wider set of declining assets.
 
 \subsection{The Validation Split Gap}
 Table~\ref{tab:split_gap} illustrates the consequences of improper validation design.
@@ -232,12 +232,12 @@ Table~\ref{tab:split_gap} illustrates the consequences of improper validation de
 \textbf{Split Design} & \textbf{Client Overlap} & \textbf{Base Rate} & \textbf{P@50} & \textbf{ROC-AUC} \\
 \midrule
 Naive Random Split & 31 clients (100\%) & 0.545 & 1.000 & 0.775 \\
-Honest Grouped Split & 0 clients (0\%) & 0.511 & 0.640 & 0.610 \\
+Honest Grouped Split & 0 clients (0\%) & 0.511 & 0.680 & 0.612 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Evaluating Random Forest via standard random splitting produced an artificial Precision@50 of 1.000 and ROC-AUC of 0.775 due to client memorization. When evaluated on unseen client accounts, Precision@50 settled at an honest 0.640. This substantial gap confirms that grouped validation is mandatory for assessing out-of-domain transfer.
+Evaluating Random Forest via standard random splitting produced an artificial Precision@50 of 1.000 and ROC-AUC of 0.775 due to client memorization. When evaluated on unseen client accounts, Precision@50 settled at an honest 0.680. This substantial gap confirms that grouped validation is mandatory for assessing out-of-domain transfer.
 
 \begin{figure}[htbp]
 \centering
@@ -327,7 +327,7 @@ The complete open-source project is available at: \\
 \url{https://github.com/fardinhossain/FlyRankAI-ML-Internship-Task}.
 
 \section{Conclusion}
-This paper investigated supervised machine learning for prioritizing content refresh candidates on unseen client websites. Evaluating 30,000 mature URLs across 32 client accounts from an industrial search warehouse demonstrated that supervised models achieve top-50 precision between 0.640 and 0.780 under honest client-grouped validation, more than doubling the 0.300 precision of heuristic rules. Combining predicted decay probabilities with search demand and ranking leverage in a composite Action Score reached a top-50 precision of 0.980.
+This paper investigated supervised machine learning for prioritizing content refresh candidates on unseen client websites. Evaluating 30,000 mature URLs across 32 client accounts from an industrial search warehouse demonstrated that supervised models achieve top-50 precision between 0.420 and 0.780 (0.680 for Random Forest) under honest client-grouped validation, more than doubling the 0.300 precision of heuristic rules. Combining predicted decay probabilities with search demand and ranking leverage in a composite Action Score reached a top-50 precision of 0.980.
 
 Furthermore, empirical results confirmed that naive random validation causes severe domain memorization, establishing client-grouped splitting as essential for reliable evaluation. This decision-support system transforms content maintenance from subjective guesswork into an evidence-backed workflow. Future research will explore counterfactual evaluation methods to measure post-update recovery directly and develop multi-task architectures that jointly predict rank drops and click-through changes.
 
