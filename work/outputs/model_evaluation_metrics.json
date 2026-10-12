@@ -1,0 +1,34 @@
+[
+  {
+    "Model": "Baseline Rules (Week 4)",
+    "Precision@50": 0.3,
+    "Avg Precision": 0.522,
+    "ROC-AUC": 0.538,
+    "Recall": "-",
+    "F1": "-"
+  },
+  {
+    "Model": "Logistic Regression",
+    "Precision@50": 0.78,
+    "Avg Precision": 0.615,
+    "ROC-AUC": 0.625,
+    "Recall": 0.669,
+    "F1": 0.624
+  },
+  {
+    "Model": "Decision Tree (depth=5)",
+    "Precision@50": 0.42,
+    "Avg Precision": 0.57,
+    "ROC-AUC": 0.592,
+    "Recall": 0.574,
+    "F1": 0.584
+  },
+  {
+    "Model": "Random Forest (100 trees)",
+    "Precision@50": 0.68,
+    "Avg Precision": 0.602,
+    "ROC-AUC": 0.612,
+    "Recall": 0.668,
+    "F1": 0.618
+  }
+]
